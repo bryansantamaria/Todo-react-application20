@@ -12,9 +12,10 @@ class App extends Component {
       selectedTodo: null,
       inputField: "",
       editBtnState: false,
-      toggleCreateOrder: true,
-      toggleUpdatedOrder: true,
+      toggleCreateOrder: false,
+      toggleUpdatedOrder: false,
     };
+    this.limit = 0;
   }
 
   //Application has rendered on the client side
@@ -27,8 +28,6 @@ class App extends Component {
   handleBtnState = (editBtnState) => {
     this.setState({ editBtnState });
   };
-
-  componentDidUpdate() {}
 
   //Body posts title & done, then recieves data from end point and updates state.
   createToDo = (title) => {
@@ -142,6 +141,30 @@ class App extends Component {
     }
   };
 
+  paginateFwrd = () => {
+    axios.get(`http://localhost:8080/todo/limit/${this.limit}`).then((res) => {
+      let oldState = [...this.state.todos];
+      oldState = res.data;
+      this.setState({
+        todos: oldState,
+      });
+    });
+    this.limit++;
+  };
+
+  paginateBckwrd = () => {
+    if (this.limit !== 0) {
+      this.limit--;
+    }
+    axios.get(`http://localhost:8080/todo/limit/${this.limit}`).then((res) => {
+      let oldState = [...this.state.todos];
+      oldState = res.data;
+      this.setState({
+        todos: oldState,
+      });
+    });
+  };
+
   render() {
     return (
       <div className="App">
@@ -156,6 +179,8 @@ class App extends Component {
               toggleCreateOrder={this.state.toggleCreateOrder}
               orderByUpdated={this.orderByUpdated}
               toggleUpdatedOrder={this.state.toggleUpdatedOrder}
+              paginateFwrd={this.paginateFwrd}
+              paginateBckwrd={this.paginateBckwrd}
             />
 
             <CreateToDo
