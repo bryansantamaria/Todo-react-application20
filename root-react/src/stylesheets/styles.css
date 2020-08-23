@@ -44,11 +44,32 @@
 }
 
 .MuiInputBase-root {
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 h3 {
   margin: 0;
+}
+
+.bottomNavigator {
+  padding: 7px;
+  height: 30px;
+  background-color: #ffffff;
+  position: -webkit-sticky;
+  position: sticky;
+  border-top: 0.1px rgb(185, 178, 178) solid;
+  bottom: 0;
+}
+
+.paginationBtn {
+  border: none;
+  background-color: #ffffff;
+  font-size: 1.5rem;
+  float: right;
+}
+
+.paginationBtn:hover {
+  cursor: pointer;
 }
 
 #submitBtn {
