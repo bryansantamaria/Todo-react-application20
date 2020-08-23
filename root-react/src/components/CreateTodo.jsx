@@ -42,6 +42,7 @@ class CreateToDo extends Component {
           id="standard-basic"
           variant="outlined"
           size="small"
+          required
           value={this.state.title}
           onChange={this.onChange}
           placeholder={this.inputField()}
