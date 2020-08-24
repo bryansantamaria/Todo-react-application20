@@ -7,7 +7,7 @@ const create = async (req, res) => {
     const doc = await createUser(firstName, lastName, password, email);
     return res.status(200).json(doc);
   } catch (error) {
-    return res.status(400).json(error);
+    return res.status(403).json(error);
   }
 };
 
