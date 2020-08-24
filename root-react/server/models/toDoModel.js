@@ -1,8 +1,4 @@
-const Datastore = require("nedb-promises");
-const toDoCollection = new Datastore({
-  filename: "./database/ToDo.db",
-  autoload: true,
-});
+const { toDoCollection } = require("../database/dataBase");
 
 const insertToDo = async (title, done) => {
   const doc = await toDoCollection.insert({
