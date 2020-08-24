@@ -17,10 +17,11 @@ const createUser = async (firstName, lastName, password, email) => {
 };
 
 const loginUser = async (password, email) => {
-  const doc = await userCollection.find({ email: email });
+  const doc = await userCollection.findOne({ email: email });
   if (!doc) res.status(403).json("Email not found");
 
   const success = bcrypt.compareSync(password, doc.password);
+  console.log(success);
   if (!success) res.status(403).json("Wrong password");
 
   return doc;
