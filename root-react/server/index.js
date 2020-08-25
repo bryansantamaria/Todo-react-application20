@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/", usersRoute);
-app.use("/todo", authenticate, toDosRoute);
+app.use("/todo", toDosRoute);
 
 app.use(express.static(path.join(__dirname, "..", "build")));
 app.use(express.static("public"));
