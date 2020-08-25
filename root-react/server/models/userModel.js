@@ -1,8 +1,8 @@
 const { userCollection } = require("../database/dataBase");
 const bcrypt = require("bcryptjs");
 
-const createUser = async (firstName, lastName, password, email) => {
-  const doc = await userCollection.find({ email: email });
+const createUser = async (firstName, lastName, email, password) => {
+  const doc = await userCollection.findOne({ email: email });
   if (!doc) {
     const hash = bcrypt.hashSync(password, 10);
     const doc = await userCollection.insert({
@@ -16,7 +16,7 @@ const createUser = async (firstName, lastName, password, email) => {
   return console.log("EMAIL already registered!");
 };
 
-const loginUser = async (password, email) => {
+const loginUser = async (email, password) => {
   const doc = await userCollection.findOne({ email: email });
   if (!doc) res.status(403).json("Email not found");
 

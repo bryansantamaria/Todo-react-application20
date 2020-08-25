@@ -6,6 +6,18 @@
   margin: auto !important;
 }
 
+.accForm {
+  margin: auto !important;
+  width: 55vw;
+}
+
+.card {
+  padding: 20px;
+}
+.createInputs {
+  width: 45vw !important;
+}
+
 .nobull {
   list-style-type: none;
   padding-inline-start: 10px;

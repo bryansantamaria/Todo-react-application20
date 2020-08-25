@@ -45,3 +45,18 @@ export const getOrderBy = async (url) => {
   });
   return data;
 };
+
+export const postAccount = async (firstName, lastName, email, password) => {
+  const data = await axios
+    .post("http://localhost:8080/create", {
+      firstName,
+      lastName,
+      email,
+      password,
+    })
+    .then((res) => {
+      console.log(res);
+      return res;
+    });
+  return data;
+};
