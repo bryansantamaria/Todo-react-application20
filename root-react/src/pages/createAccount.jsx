@@ -77,20 +77,23 @@ class CreateAccount extends Component {
               placeholder="Password..."
             />
             <div>
-              <a href="/login">
-                <span>Already have an account?</span>
-              </a>{" "}
-              <Button
-                className="btn-todoitem submitBtn"
-                type="submit"
-                value="Create Account"
-                variant="contained"
-                color="inherit"
-                id="submitBtn"
-                onClick={this.postAcc}
-              >
-                Submit Account
-              </Button>{" "}
+              <div className="margin-top">
+                <span>Already have an account?</span> <br />
+                <a className="loginAnchor" href="/login">
+                  <span>Sign in</span>
+                </a>{" "}
+                <Button
+                  className="btn-todoitem"
+                  type="submit"
+                  value="Create Account"
+                  variant="contained"
+                  id="submitCreate"
+                  color="inherit"
+                  onClick={this.postAcc}
+                >
+                  Submit Account
+                </Button>{" "}
+              </div>
             </div>
           </Card>
         </form>

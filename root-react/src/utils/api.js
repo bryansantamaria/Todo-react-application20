@@ -60,3 +60,15 @@ export const postAccount = async (firstName, lastName, email, password) => {
     });
   return data;
 };
+
+export const postLogin = async (email, password) => {
+  const data = await axios
+    .post("http://localhost:8080/login", {
+      email,
+      password,
+    })
+    .then((res) => {
+      return res;
+    });
+  return data;
+};

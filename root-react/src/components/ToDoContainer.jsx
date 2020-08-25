@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import ToDoItem from "./ToDoItem";
+import CreateToDo from "./CreateToDo";
+
 import {
   Typography,
   Table,
@@ -11,7 +13,7 @@ import {
   Paper,
 } from "@material-ui/core";
 
-class ToDoContainer extends Component {
+export default class ToDoContainer extends Component {
   state = {};
 
   toggleCreatedArrow = () => {
@@ -96,9 +98,17 @@ class ToDoContainer extends Component {
             </div>
           </TableContainer>
         </Paper>
+        <CreateToDo
+          createToDo={this.props.createToDo}
+          update={this.props.update}
+          selectedTodo={this.props.selectedTodo}
+          inputField={this.props.inputField}
+          editBtnState={this.props.editBtnState}
+          handleBtnState={this.props.handleBtnState}
+        />
       </div>
     );
   }
 }
 
-export default ToDoContainer;
+// export default ToDoContainer;

@@ -1,8 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
-const toDosRoute = require("./routes/toDoRoute.js");
 const usersRoute = require("./routes/userRoute");
+const toDosRoute = require("./routes/toDoRoute.js");
 const { authenticate } = require("./middlewares/auth");
 const cors = require("cors");
 

@@ -13,9 +13,36 @@
 
 .card {
   padding: 20px;
+  min-height: 50vh;
 }
 .createInputs {
-  width: 45vw !important;
+  width: 50vw !important;
+}
+
+.loginAnchor {
+  color: rgb(107, 107, 241);
+  text-decoration: none;
+  margin-left: 13vh;
+}
+
+.createAnchor {
+  color: rgb(107, 107, 241);
+  text-decoration: none;
+  margin-left: 5vh;
+}
+
+.margin-top {
+  margin-top: 12px;
+}
+
+#submitCreate {
+  color: white;
+  background-color: rgb(59, 148, 59);
+  float: right;
+}
+
+#loginBottom {
+  margin-top: 19.2vh;
 }
 
 .nobull {
@@ -60,6 +87,10 @@
 }
 
 h3 {
+  margin: 0;
+}
+
+h1 {
   margin: 0;
 }
 

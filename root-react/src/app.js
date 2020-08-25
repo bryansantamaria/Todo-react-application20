@@ -3,13 +3,13 @@ import axios from "axios";
 import "./stylesheets/styles.css";
 import { Route, BrowserRouter, Switch } from "react-router-dom";
 import ProtectedRoute from "./middlewares/protectedRoute";
+import PrivateRoute from "./middlewares/privateRoute";
 import Login from "./pages/login";
 import CreateAccount from "./pages/createAccount";
 
 import { getTodos, postToDo, patchToDo, getOrderBy } from "./utils/api";
 import { delToDo } from "./utils/api";
 
-import CreateToDo from "./components/CreateToDo";
 import ToDoContainer from "./components/ToDoContainer";
 
 class App extends Component {
@@ -157,6 +157,7 @@ class App extends Component {
   };
 
   render() {
+    const isAuthenticated = false;
     return (
       <div className="App">
         <header className="App-header">
@@ -164,37 +165,30 @@ class App extends Component {
             <Switch>
               <Route path="/login" component={Login} />
               <Route path="/create" component={CreateAccount} />
-              <ProtectedRoute
-                exact={true}
-                path="/"
-                component={
-                  ((
-                    <ToDoContainer
-                      todos={this.state.todos}
-                      complete={this.complete}
-                      delete={this.delete}
-                      selectTodo={this.selectTodo}
-                      orderByCreated={this.orderByCreated}
-                      toggleCreateOrder={this.state.toggleCreateOrder}
-                      orderByUpdated={this.orderByUpdated}
-                      toggleUpdatedOrder={this.state.toggleUpdatedOrder}
-                      paginateFwrd={this.paginateFwrd}
-                      paginateBckwrd={this.paginateBckwrd}
-                    />
-                  ),
-                  (
-                    <CreateToDo
-                      createToDo={this.createToDo}
-                      update={this.update}
-                      selectedTodo={this.state.selectedTodo}
-                      inputField={this.state.inputField}
-                      editBtnState={this.state.editBtnState}
-                      handleBtnState={this.handleBtnState}
-                    />
-                  ))
-                }
+
+              <PrivateRoute
+                exact
+                path={"/todo"}
+                component={ToDoContainer}
+                isAuthenticated={isAuthenticated}
+                todos={this.state.todos}
+                complete={this.complete}
+                delete={this.delete}
+                selectTodo={this.selectTodo}
+                orderByCreated={this.orderByCreated}
+                toggleCreateOrder={this.state.toggleCreateOrder}
+                orderByUpdated={this.orderByUpdated}
+                toggleUpdatedOrder={this.state.toggleUpdatedOrder}
+                paginateFwrd={this.paginateFwrd}
+                paginateBckwrd={this.paginateBckwrd}
+                createToDo={this.createToDo}
+                update={this.update}
+                selectedTodo={this.state.selectedTodo}
+                inputField={this.state.inputField}
+                editBtnState={this.state.editBtnState}
+                handleBtnState={this.handleBtnState}
               />
-              <ProtectedRoute component={Login} />
+              <PrivateRoute component={Login} />
 
               {/* <ToDoContainer
                 todos={this.state.todos}
