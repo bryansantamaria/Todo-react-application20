@@ -9,7 +9,7 @@ const authenticate = (req, res, next) => {
     req.user = payload;
     next();
   } catch (error) {
-    return res.sendStatus(403).json(error);
+    return res.sendStatus(401).json(error);
   }
 };
 

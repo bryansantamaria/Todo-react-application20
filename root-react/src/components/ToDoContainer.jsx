@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import ToDoItem from "./ToDoItem";
 import CreateToDo from "./CreateToDo";
-
 import {
   Typography,
   Table,
@@ -13,7 +12,7 @@ import {
   Paper,
 } from "@material-ui/core";
 
-export default class ToDoContainer extends Component {
+class ToDoContainer extends Component {
   state = {};
 
   toggleCreatedArrow = () => {
@@ -111,4 +110,4 @@ export default class ToDoContainer extends Component {
   }
 }
 
-// export default ToDoContainer;
+export default ToDoContainer;

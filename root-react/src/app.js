@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import axios from "axios";
 import "./stylesheets/styles.css";
 import { Route, BrowserRouter, Switch } from "react-router-dom";
-import ProtectedRoute from "./middlewares/protectedRoute";
 import PrivateRoute from "./middlewares/privateRoute";
 import Login from "./pages/login";
 import CreateAccount from "./pages/createAccount";
@@ -22,6 +21,7 @@ class App extends Component {
       editBtnState: false,
       toggleCreateOrder: false,
       toggleUpdatedOrder: false,
+      isAuthenticated: false,
     };
     this.limit = 0;
     this.localHost = "http://localhost:8080/todo/";
@@ -156,21 +156,35 @@ class App extends Component {
     });
   };
 
+  isAuthenticated = (auth) => {
+    const isAuthenticated = localStorage.getItem("token");
+    // console.log(auth === isAuthenticated);
+
+    if (auth === isAuthenticated) console.log("Authorized");
+    return this.setState({ isAuthenticated: true });
+  };
+
   render() {
-    const isAuthenticated = false;
+    console.log(this.state.isAuthenticated);
     return (
       <div className="App">
         <header className="App-header">
           <BrowserRouter>
             <Switch>
-              <Route path="/login" component={Login} />
+              <Route
+                path="/login"
+                render={(props) => (
+                  <Login {...props} auth={this.isAuthenticated} />
+                )}
+              />
+
               <Route path="/create" component={CreateAccount} />
 
               <PrivateRoute
                 exact
                 path={"/todo"}
                 component={ToDoContainer}
-                isAuthenticated={isAuthenticated}
+                isAuthenticated={this.state.isAuthenticated}
                 todos={this.state.todos}
                 complete={this.complete}
                 delete={this.delete}

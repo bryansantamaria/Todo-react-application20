@@ -10,7 +10,8 @@ class Login extends Component {
     const res = await postLogin(email, password);
 
     console.log(res.data);
-    window.localStorage.setItem("token", res.data);
+    if (res.data) window.localStorage.setItem("token", res.data);
+    this.props.auth(res.data);
   };
 
   onSubmit = (e) => {
