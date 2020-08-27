@@ -14,12 +14,8 @@ const create = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const doc = await loginUser(email, password);
-    console.log(doc);
-    const token = jwt.sign({ email: doc.email }, process.env.SECRET, {
-      expiresIn: "1h",
-    });
-    console.log(token);
+    const token = await loginUser(email, password);
+
     return res.status(200).json(token);
   } catch (error) {
     return res.status(401).json(error);
