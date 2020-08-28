@@ -3,7 +3,13 @@ const { createUser, loginUser } = require("../models/userModel");
 const create = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
   try {
-    const doc = await createUser(firstName, lastName, email, password);
+    const doc = await createUser(
+      firstName,
+      lastName,
+      email,
+      password,
+      req.user.role
+    );
     return res.status(200).json(doc);
   } catch (error) {
     return res.status(401).json(error);
