@@ -33,7 +33,6 @@ const updateToDo = async (postId, title, done, userId, role) => {
         $set: {
           title,
           done,
-          userId,
           created: item.created,
           lastUpdated: new Date().toLocaleString(),
         },

@@ -14,7 +14,7 @@ const router = new Router();
 
 router.get("/", authenticate, getToDos);
 router.post("/create", authenticate, createToDo);
-router.put("/update/:id", authenticate, updToDo);
+router.patch("/update/:id", authenticate, updToDo);
 router.delete("/delete/:id", authenticate, delToDo);
 router.get("/sort/created:order", authenticate, sortCreate);
 router.get("/sort/lastUpdated:order", authenticate, sortUpdated);
