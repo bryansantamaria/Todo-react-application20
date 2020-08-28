@@ -11,22 +11,25 @@ const insertToDo = async (title, done, userId) => {
   return doc;
 };
 
-const findToDos = async (id) => {
-  const doc = await toDoCollection
-    .find({ userId: id })
-    .limit(5)
-    .sort({ created: -1 });
-  return doc;
+const findToDos = async (id, role) => {
+  const isAdmin = await checkAuthorization(role);
+  if (isAdmin) {
+    const doc = await toDoCollection.find({}).limit(5).sort({ created: -1 });
+    return doc;
+  } else {
+    const doc = await toDoCollection
+      .find({ userId: id })
+      .limit(5)
+      .sort({ created: -1 });
+    return doc;
+  }
 };
 
 const updateToDo = async (postId, title, done, userId, role) => {
   const item = await toDoCollection.findOne({ _id: postId });
   const isOwner = await ownerOfPost(item, userId);
   const isAdmin = await checkAuthorization(role);
-  console.log("isOwner: " + isOwner);
-  console.log("isAdmin: " + isAdmin);
   if (isOwner || isAdmin) {
-    console.log("Entering isOwner or IsAdmin");
     const doc = await toDoCollection.update(
       { _id: postId },
       {
@@ -47,8 +50,6 @@ const deleteToDo = async (postId, userId, role) => {
   const item = await toDoCollection.findOne({ _id: postId });
   const isOwner = await ownerOfPost(item, userId);
   const isAdmin = await checkAuthorization(role);
-  console.log("isAuthorized: " + isOwner);
-  console.log("isAdmin: " + isAdmin);
 
   if (isOwner || isAdmin) {
     const doc = await toDoCollection.remove({ _id: postId });
@@ -64,7 +65,6 @@ const sortByCreated = async (order, userId, role) => {
       .sort({ created: order })
       .limit(5)
       .exec();
-    console.log(doc);
     return doc;
   } else {
     const doc = await toDoCollection
@@ -72,7 +72,6 @@ const sortByCreated = async (order, userId, role) => {
       .sort({ created: order })
       .limit(5)
       .exec();
-    console.log(doc);
     return doc;
   }
 };
@@ -86,7 +85,6 @@ const sortByUpdated = async (order, userId, role) => {
       .sort({ lastUpdated: order })
       .limit(5)
       .exec();
-    console.log(doc);
     return doc;
   } else {
     const doc = await toDoCollection
@@ -94,14 +92,12 @@ const sortByUpdated = async (order, userId, role) => {
       .sort({ lastUpdated: order })
       .limit(5)
       .exec();
-    console.log(doc);
     return doc;
   }
 };
 
 const limitPaginate = async (perPage, skip, userId, role) => {
   const isAdmin = await checkAuthorization(role);
-  console.log("isAdmin: " + isAdmin);
   if (isAdmin) {
     const doc = await toDoCollection
       .find({})
@@ -111,7 +107,6 @@ const limitPaginate = async (perPage, skip, userId, role) => {
       .exec();
     return doc;
   } else {
-    console.log("entering limit: ");
     const doc = await toDoCollection
       .find({ userId: userId })
       .sort({ created: -1 })

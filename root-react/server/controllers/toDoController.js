@@ -21,7 +21,8 @@ const createToDo = async (req, res) => {
 
 const getToDos = async (req, res) => {
   try {
-    const doc = await findToDos(req.user.userId);
+    const { userId, role } = req.user;
+    const doc = await findToDos(userId, role);
     return res.status(200).json(doc);
   } catch (error) {
     return res.status(400).json(error);
@@ -70,7 +71,6 @@ const sortUpdated = async (req, res) => {
 const paginate = async (req, res) => {
   try {
     const { userId, role } = req.user;
-    console.log(role);
     let perPage = 5;
     let skip = Math.max(0, req.params.skip);
     const doc = await limitPaginate(perPage, skip, userId, role);

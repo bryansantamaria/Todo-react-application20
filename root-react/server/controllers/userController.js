@@ -20,4 +20,13 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { create, login };
+const getUser = async (req, res) => {
+  try {
+    console.log(req.user);
+    return res.status(200).json(req.user);
+  } catch (error) {
+    return res.status(401).json(error);
+  }
+};
+
+module.exports = { create, login, getUser };
