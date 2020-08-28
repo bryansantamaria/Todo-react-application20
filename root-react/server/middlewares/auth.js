@@ -7,6 +7,7 @@ const authenticate = async (req, res, next) => {
   try {
     const payload = await verifyToken(token, process.env.SECRET);
     req.user = payload;
+    console.log(req.user);
     next();
   } catch (error) {
     return res.sendStatus(401).json(error);

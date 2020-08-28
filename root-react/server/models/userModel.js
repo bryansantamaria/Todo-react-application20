@@ -11,6 +11,7 @@ const createUser = async (firstName, lastName, email, password) => {
       lastName,
       password: hash,
       email,
+      role: "user",
     });
     return doc;
   }
@@ -21,12 +22,17 @@ const loginUser = async (email, password) => {
   const doc = await userCollection.findOne({ email: email });
   if (!doc) res.status(403).json("Email not found");
 
-  const success = bcrypt.compareSync(password, doc.password);
-  console.log(success);
+  const success = await bcrypt.compareSync(password, doc.password);
   if (!success) res.status(403).json("Wrong password");
-  const token = jwt.sign({ email: doc.email }, process.env.SECRET, {
-    expiresIn: "1h",
-  });
+
+  const token = await jwt.sign(
+    { email: doc.email, userId: doc._id, role: doc.role },
+    process.env.SECRET,
+    {
+      expiresIn: "1h",
+    }
+  );
+  console.log(token);
   return token;
 };
 
