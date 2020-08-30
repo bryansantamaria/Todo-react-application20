@@ -131,6 +131,7 @@ const checkAuthorization = async (role) => {
     return false;
   }
 };
+
 module.exports = {
   insertToDo,
   findToDos,

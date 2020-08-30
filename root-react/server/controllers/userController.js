@@ -28,8 +28,9 @@ const login = async (req, res) => {
 
 const getUser = async (req, res) => {
   try {
-    const { email, role } = req.user;
-    return res.status(200).json({ email, role });
+    console.log(req.user);
+    const { name, role } = req.user;
+    return res.status(200).json({ name, role });
   } catch (error) {
     return res.status(401).json(error);
   }

@@ -28,7 +28,7 @@ const loginUser = async (email, password) => {
   if (!success) res.status(403).json("Wrong password");
 
   const token = await jwt.sign(
-    { email: doc.email, userId: doc._id, role: doc.role },
+    { email: doc.email, userId: doc._id, role: doc.role, name: doc.firstName },
     process.env.SECRET,
     {
       expiresIn: "1h",
