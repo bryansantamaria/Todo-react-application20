@@ -9,9 +9,10 @@ class Login extends Component {
     const { email, password } = this.state;
     const res = await postLogin(email, password);
 
-    console.log(res.data);
-    if (res.data) window.localStorage.setItem("token", res.data);
-    this.props.auth(res.data);
+    if (res.data) {
+      window.localStorage.setItem("token", res.data);
+      return this.props.auth(res.data);
+    }
   };
 
   onSubmit = (e) => {
@@ -22,8 +23,7 @@ class Login extends Component {
 
   render() {
     return (
-      <div>
-        {" "}
+      <div id="login-container">
         <form onSubmit={this.onSubmit} className="accForm">
           <Card className="card">
             <h1>Login</h1>
@@ -53,10 +53,6 @@ class Login extends Component {
             />
             <div>
               <div id="loginBottom">
-                <span id="loginBottom">Dont have an account?</span> <br />
-                <a className="createAnchor" href="/create">
-                  <span>Create Account</span>
-                </a>{" "}
                 <Button
                   className="btn-todoitem"
                   type="submit"

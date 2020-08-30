@@ -7,7 +7,13 @@ class CreateAccount extends Component {
 
   postAcc = async () => {
     const { firstName, lastName, email, password } = this.state;
-    const res = await postAccount(firstName, lastName, email, password);
+    const res = await postAccount(
+      firstName,
+      lastName,
+      email,
+      password,
+      this.props.token
+    );
 
     this.setState({ users: res.data });
     console.log(this.state.users);
@@ -22,7 +28,7 @@ class CreateAccount extends Component {
 
   render() {
     return (
-      <div>
+      <div id="login-container">
         {" "}
         <form onSubmit={this.onSubmit} className="accForm">
           <Card className="card">
@@ -79,7 +85,7 @@ class CreateAccount extends Component {
             <div>
               <div className="margin-top">
                 <span>Already have an account?</span> <br />
-                <a className="loginAnchor" href="/login">
+                <a className="loginAnchor" href="/auth">
                   <span>Sign in</span>
                 </a>{" "}
                 <Button

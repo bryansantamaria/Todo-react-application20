@@ -1,12 +1,13 @@
 import React from "react";
 import { Redirect, Route } from "react-router-dom";
 
-function PrivateRoute({ component: Component, isAuthenticated, ...rest }) {
+function PrivateRouteCreate({ component: Component, ...rest }) {
+  const isAdmin = localStorage.getItem("role");
   return (
     <Route
       {...rest}
       render={(props) =>
-        isAuthenticated ? (
+        isAdmin === "admin" ? (
           <Component exact path="/todo" {...props} {...rest} />
         ) : (
           <Redirect to="/login" />
@@ -16,4 +17,4 @@ function PrivateRoute({ component: Component, isAuthenticated, ...rest }) {
   );
 }
 
-export default PrivateRoute;
+export default PrivateRouteCreate;

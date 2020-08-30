@@ -1,13 +1,21 @@
 import React, { Component } from "react";
 import axios from "axios";
 import "./stylesheets/styles.css";
-import { Route, BrowserRouter, Switch } from "react-router-dom";
+import { Route, BrowserRouter, Switch, Redirect } from "react-router-dom";
 import PrivateRoute from "./middlewares/privateRoute";
+import PrivateRouteCreate from "./middlewares/privateRouteCreate";
 import Login from "./pages/login";
 import CreateAccount from "./pages/createAccount";
 
-import { getTodos, postToDo, patchToDo, getOrderBy } from "./utils/api";
-import { delToDo } from "./utils/api";
+import {
+  getTodos,
+  postToDo,
+  patchToDo,
+  getOrderBy,
+  delToDo,
+  getUser,
+  updateCompleted,
+} from "./utils/api";
 
 import ToDoContainer from "./components/ToDoContainer";
 
@@ -22,6 +30,8 @@ class App extends Component {
       toggleCreateOrder: false,
       toggleUpdatedOrder: false,
       isAuthenticated: false,
+      token: localStorage.getItem("token"),
+      users: {},
     };
     this.limit = 0;
     this.localHost = "http://localhost:8080/todo/";
@@ -29,13 +39,31 @@ class App extends Component {
 
   //Application has rendered on the client side
   async componentDidMount() {
-    const res = await getTodos(this.localHost);
-    this.setState({ todos: res.data });
+    console.log("component did mount");
+    try {
+      if (this.state.token) {
+        const res = await getTodos(this.localHost, this.state.token);
+        const user = await getUser(
+          `http://localhost:8080/users`,
+          this.state.token
+        );
+        console.log(user.data);
+        this.setState({ todos: res.data, users: user.data });
+        window.localStorage.setItem("role", user.data.role);
+      }
+    } catch (error) {
+      console.log("ERROR");
+      console.log(error);
+    }
   }
 
   //Body posts title & done, then recieves data from end point and updates state.
   createToDo = async (title) => {
-    const res = await postToDo(`${this.localHost}create`, title);
+    const res = await postToDo(
+      `${this.localHost}create`,
+      title,
+      this.state.token
+    );
     this.setState({ todos: [...this.state.todos, res.data] });
   };
 
@@ -43,14 +71,15 @@ class App extends Component {
   delete = async (id) => {
     const toDoList = [...this.state.todos];
     const newTodos = toDoList.filter((todo) => todo._id !== id);
-    await delToDo(`${this.localHost}delete/${id}`);
+    await delToDo(`${this.localHost}delete/${id}`, this.state.token);
     this.setState({ todos: newTodos });
   };
 
   update = async (title) => {
     await patchToDo(
       `${this.localHost}update/${this.state.selectedTodo}`,
-      title
+      title,
+      this.state.token
     );
     const index = this.state.todos.findIndex(
       (todo) => todo._id === this.state.selectedTodo
@@ -66,7 +95,10 @@ class App extends Component {
 
   orderByCreated = async () => {
     if (this.state.toggleCreateOrder) {
-      const res = await getOrderBy(`${this.localHost}sort/created${-1}`);
+      const res = await getOrderBy(
+        `${this.localHost}sort/created${-1}`,
+        this.state.token
+      );
       let oldState = [...this.state.todos];
       oldState = res.data;
       this.setState({
@@ -74,7 +106,10 @@ class App extends Component {
         toggleCreateOrder: false,
       });
     } else if (!this.state.toggleCreateOrder) {
-      const res = await getOrderBy(`${this.localHost}sort/created${1}`);
+      const res = await getOrderBy(
+        `${this.localHost}sort/created${1}`,
+        this.state.token
+      );
       let oldState = [...this.state.todos];
       oldState = res.data;
       this.setState({
@@ -86,34 +121,52 @@ class App extends Component {
 
   orderByUpdated = () => {
     if (this.state.toggleUpdatedOrder) {
-      axios.get(`${this.localHost}sort/lastUpdated${-1}`).then((res) => {
-        let oldState = [...this.state.todos];
-        oldState = res.data;
-        this.setState({
-          todos: oldState,
-          toggleUpdatedOrder: false,
+      axios
+        .get(`${this.localHost}sort/lastUpdated${-1}`, {
+          headers: {
+            Authorization: "Bearer " + this.state.token,
+          },
+        })
+        .then((res) => {
+          let oldState = [...this.state.todos];
+          oldState = res.data;
+          this.setState({
+            todos: oldState,
+            toggleUpdatedOrder: false,
+          });
         });
-      });
     } else if (!this.state.toggleUpdatedOrder) {
-      axios.get(`${this.localHost}sort/lastUpdated${1}`).then((res) => {
-        let oldState = [...this.state.todos];
-        oldState = res.data;
-        this.setState({
-          todos: oldState,
-          toggleUpdatedOrder: true,
+      axios
+        .get(`${this.localHost}sort/lastUpdated${1}`, {
+          headers: {
+            Authorization: "Bearer " + this.state.token,
+          },
+        })
+        .then((res) => {
+          let oldState = [...this.state.todos];
+          oldState = res.data;
+          this.setState({
+            todos: oldState,
+            toggleUpdatedOrder: true,
+          });
         });
-      });
     }
   };
 
   paginateFwrd = () => {
-    axios.get(`${this.localHost}limit/${this.limit}`).then((res) => {
-      let oldState = [...this.state.todos];
-      oldState = res.data;
-      this.setState({
-        todos: oldState,
+    axios
+      .get(`${this.localHost}limit/${this.limit}`, {
+        headers: {
+          Authorization: "Bearer " + this.state.token,
+        },
+      })
+      .then((res) => {
+        let oldState = [...this.state.todos];
+        oldState = res.data;
+        this.setState({
+          todos: oldState,
+        });
       });
-    });
     this.limit++;
   };
 
@@ -121,13 +174,19 @@ class App extends Component {
     if (this.limit !== 0) {
       this.limit--;
     }
-    axios.get(`${this.localHost}limit/${this.limit}`).then((res) => {
-      let oldState = [...this.state.todos];
-      oldState = res.data;
-      this.setState({
-        todos: oldState,
+    axios
+      .get(`${this.localHost}limit/${this.limit}`, {
+        headers: {
+          Authorization: "Bearer " + this.state.token,
+        },
+      })
+      .then((res) => {
+        let oldState = [...this.state.todos];
+        oldState = res.data;
+        this.setState({
+          todos: oldState,
+        });
       });
-    });
   };
 
   selectTodo = (id) => {
@@ -145,7 +204,7 @@ class App extends Component {
     this.setState({ editBtnState });
   };
 
-  complete = (id) => {
+  complete = async (id) => {
     this.setState({
       todos: this.state.todos.map((todo) => {
         if (todo._id === id) {
@@ -154,37 +213,52 @@ class App extends Component {
         return todo;
       }),
     });
+    const index = this.state.todos.findIndex((todo) => todo._id === id);
+    const { title, done } = this.state.todos[index];
+    await updateCompleted(
+      `${this.localHost}update/${id}`,
+      title,
+      done,
+      this.state.token
+    );
   };
 
   isAuthenticated = (auth) => {
     const isAuthenticated = localStorage.getItem("token");
-    // console.log(auth === isAuthenticated);
 
-    if (auth === isAuthenticated) console.log("Authorized");
-    return this.setState({ isAuthenticated: true });
+    if (auth === isAuthenticated) {
+      console.log("Authorized");
+      this.setState({ isAuthenticated: true, token: isAuthenticated });
+    }
+    window.location.href = "http://localhost:3000/todo";
   };
 
   render() {
-    console.log(this.state.isAuthenticated);
     return (
       <div className="App">
         <header className="App-header">
           <BrowserRouter>
             <Switch>
               <Route
-                path="/login"
+                path="/auth"
                 render={(props) => (
                   <Login {...props} auth={this.isAuthenticated} />
                 )}
               />
 
-              <Route path="/create" component={CreateAccount} />
+              <PrivateRouteCreate
+                exact
+                path="/create"
+                component={CreateAccount}
+                token={this.state.token}
+              />
 
               <PrivateRoute
                 exact
                 path={"/todo"}
                 component={ToDoContainer}
-                isAuthenticated={this.state.isAuthenticated}
+                isAuthenticated={this.state.token}
+                users={this.state.users}
                 todos={this.state.todos}
                 complete={this.complete}
                 delete={this.delete}
@@ -202,29 +276,7 @@ class App extends Component {
                 editBtnState={this.state.editBtnState}
                 handleBtnState={this.handleBtnState}
               />
-              <PrivateRoute component={Login} />
-
-              {/* <ToDoContainer
-                todos={this.state.todos}
-                complete={this.complete}
-                delete={this.delete}
-                selectTodo={this.selectTodo}
-                orderByCreated={this.orderByCreated}
-                toggleCreateOrder={this.state.toggleCreateOrder}
-                orderByUpdated={this.orderByUpdated}
-                toggleUpdatedOrder={this.state.toggleUpdatedOrder}
-                paginateFwrd={this.paginateFwrd}
-                paginateBckwrd={this.paginateBckwrd}
-              />
-
-              <CreateToDo
-                createToDo={this.createToDo}
-                update={this.update}
-                selectedTodo={this.state.selectedTodo}
-                inputField={this.state.inputField}
-                editBtnState={this.state.editBtnState}
-                handleBtnState={this.handleBtnState}
-              /> */}
+              <Redirect to={{ pathname: "/auth" }} />
             </Switch>
           </BrowserRouter>
         </header>

@@ -1,17 +1,12 @@
 import axios from "axios";
 
-export const getTodos = async (url) => {
-  const data = await axios.get(url).then((res) => {
-    return res;
-  });
-  return data;
-};
-
-export const postToDo = async (url, title) => {
+export const getTodos = async (url, token) => {
+  console.log(token);
   const data = await axios
-    .post(url, {
-      title,
-      done: false,
+    .get(url, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
     })
     .then((res) => {
       return res;
@@ -19,19 +14,68 @@ export const postToDo = async (url, title) => {
   return data;
 };
 
-export const delToDo = async (url) => {
-  const data = await axios.delete(url).then((res) => {
-    return res;
-  });
+export const getUser = async (url, token) => {
+  const data = await axios
+    .get(url, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+    .then((res) => {
+      return res;
+    });
   return data;
 };
 
-export const patchToDo = async (url, title) => {
+export const postToDo = async (url, title, token) => {
+  console.log(token);
   const data = await axios
-    .put(url, {
-      title: title,
-      done: false,
+    .post(
+      url,
+      {
+        title,
+        done: false,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    )
+    .then((res) => {
+      console.log(res);
+      return res;
+    });
+  return data;
+};
+
+export const delToDo = async (url, token) => {
+  const data = await axios
+    .delete(url, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
     })
+    .then((res) => {
+      return res;
+    });
+  return data;
+};
+
+export const patchToDo = async (url, title, token) => {
+  const data = await axios
+    .patch(
+      url,
+      {
+        title,
+        done: false,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    )
     .then((res) => {
       return res;
     });
@@ -39,21 +83,62 @@ export const patchToDo = async (url, title) => {
   return data;
 };
 
-export const getOrderBy = async (url) => {
-  const data = await await axios.get(url).then((res) => {
-    return res;
-  });
+export const updateCompleted = async (url, title, done, token) => {
+  const data = await axios
+    .patch(
+      url,
+      {
+        title,
+        done,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    )
+    .then((res) => {
+      return res;
+    });
+  console.log(data);
   return data;
 };
 
-export const postAccount = async (firstName, lastName, email, password) => {
-  const data = await axios
-    .post("http://localhost:8080/create", {
-      firstName,
-      lastName,
-      email,
-      password,
+export const getOrderBy = async (url, token) => {
+  const data = await await axios
+    .get(url, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
     })
+    .then((res) => {
+      return res;
+    });
+  return data;
+};
+
+export const postAccount = async (
+  firstName,
+  lastName,
+  email,
+  password,
+  token
+) => {
+  const data = await axios
+    .post(
+      "http://localhost:8080/create",
+      {
+        firstName,
+        lastName,
+        email,
+        password,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    )
     .then((res) => {
       console.log(res);
       return res;
@@ -63,7 +148,7 @@ export const postAccount = async (firstName, lastName, email, password) => {
 
 export const postLogin = async (email, password) => {
   const data = await axios
-    .post("http://localhost:8080/login", {
+    .post("http://localhost:8080/auth", {
       email,
       password,
     })
