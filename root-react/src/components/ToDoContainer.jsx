@@ -34,8 +34,8 @@ class ToDoContainer extends Component {
       <span>
         <a className="addUserIcon" href="/create">
           <i className="fas fa-user-plus userIcons" href="/create"></i>
+          <span id="add">Add</span>
         </a>{" "}
-        <span id="add">Add</span>
       </span>
     ) : (
       <span></span>
@@ -55,8 +55,12 @@ class ToDoContainer extends Component {
           </span>
           <div id="userGrid">
             {this.addUserIfAdmin()}
-            <a id="logoutBtn" className="fas fa-sign-out-alt" href="/auth"></a>
-            <span id="logout">Logout</span>
+            <a id="logoutBtn" className="fas fa-sign-out-alt" href="/auth">
+              {" "}
+              <span id="logout" type="a" href="/auth">
+                Logout
+              </span>
+            </a>
           </div>
         </div>
 
