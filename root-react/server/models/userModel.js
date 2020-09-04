@@ -2,30 +2,28 @@ const { userCollection } = require('../database/dataBase');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const createUser = async (firstName, lastName, email, password, role) => {
+const createUser = async (firstName, lastName, email, password) => {
 	const doc = await userCollection.findOne({ email: email });
-	if (role === 'admin') {
-		if (!doc) {
-			const hash = bcrypt.hashSync(password, 10);
-			const doc = await userCollection.insert({
-				firstName,
-				lastName,
-				password: hash,
-				email,
-				role: 'user',
-			});
-			return doc;
-		}
-		return console.log('EMAIL already registered!');
+	if (!doc) {
+		const hash = bcrypt.hashSync(password, 10);
+		const doc = await userCollection.insert({
+			firstName,
+			lastName,
+			password: hash,
+			email,
+			role: 'user',
+		});
+		return doc;
 	}
+	return console.log('EMAIL already registered!');
 };
 
 const loginUser = async (email, password) => {
 	const doc = await userCollection.findOne({ email: email });
-	if (!doc) res.status(403).json('Email not found');
+	if (!doc) return json('Email not found');
 
 	const success = await bcrypt.compareSync(password, doc.password);
-	if (!success) res.status(403).json('Wrong password');
+	if (!success) return json('Wrong password');
 
 	const token = await jwt.sign(
 		{ email: doc.email, userId: doc._id, role: doc.role, name: doc.firstName },
@@ -34,7 +32,6 @@ const loginUser = async (email, password) => {
 			expiresIn: '1h',
 		}
 	);
-	console.log(token);
 	return token;
 };
 
@@ -43,4 +40,24 @@ const verifyToken = async (token, secret) => {
 	return validToken;
 };
 
-module.exports = { createUser, loginUser, verifyToken };
+const clear = async () => {
+	const doc = await userCollection.remove({}, { multi: true });
+	return doc;
+};
+
+const checkAuthorization = async (role) => {
+	console.log('role: ' + role);
+	if (role === 'admin') {
+		return true;
+	} else {
+		return false;
+	}
+};
+
+module.exports = {
+	createUser,
+	loginUser,
+	verifyToken,
+	clear,
+	checkAuthorization,
+};

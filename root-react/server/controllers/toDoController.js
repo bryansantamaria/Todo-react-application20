@@ -1,140 +1,99 @@
 const {
-  insertToDo,
-  findToDosAdmin,
-  findToDosUser,
-  updateToDoAdmin,
-  updateToDoUser,
-  deleteToDoAdmin,
-  deleteToDoUser,
-  sortByCreatedAdmin,
-  sortByCreatedUser,
-  sortByUpdatedAdmin,
-  sortByUpdatedUser,
-  limitPaginateAdmin,
-  limitPaginateUser,
-} = require("../models/toDoModel");
+	insertToDo,
+	getAsAdmin,
+	getAsUser,
+	deleteAsAdmin,
+	deleteAsUser,
+	checkAuthorization,
+	isOwner,
+	updateTodo,
+	getTodoItems,
+} = require('../models/toDoModel');
 
-const createToDo = async (req, res) => {
-  try {
-    const { title, done } = req.body;
-    const doc = await insertToDo(title, done, req.user.userId);
+const create = async (req, res) => {
+	try {
+		const { title } = req.body;
+		const doc = await insertToDo(title, req.user.userId);
 
-    return res.status(200).json(doc);
-  } catch (error) {
-    return res.status(403).json(error);
-  }
+		return res.status(200).json(doc);
+	} catch (error) {
+		return res.status(403).json(error);
+	}
 };
 
-const getToDos = async (req, res) => {
-  try {
-    const { userId, role } = req.user;
+const get = async (req, res) => {
+	try {
+		const { userId, role } = req.user;
 
-    if (await checkAuthorization(role)) {
-      const doc = await findToDosAdmin();
-      return res.status(200).json(doc);
-    } else {
-      const doc = await findToDosUser(userId);
-      return res.status(200).json(doc);
-    }
-  } catch (error) {
-    return res.status(403).json(error);
-  }
+		if (await checkAuthorization(role)) {
+			const doc = await getAsAdmin();
+			return res.status(200).json(doc);
+		} else {
+			const doc = await getAsUser(userId);
+			return res.status(200).json(doc);
+		}
+	} catch (error) {
+		return res.status(403).json(error);
+	}
 };
 
-const updToDo = async (req, res) => {
-  try {
-    const { title, done } = req.body;
-    const { userId, role } = req.user;
+const del = async (req, res) => {
+	try {
+		const { userId, role } = req.user;
 
-    if (await checkAuthorization(role)) {
-      const doc = await updateToDoAdmin(req.params.id, title, done);
-      return res.status(200).json(doc);
-    } else {
-      const doc = await updateToDoUser(req.params.id, title, done, userId);
-      return res.status(200).json(doc);
-    }
-  } catch (error) {
-    return res.status(403).json(error);
-  }
+		if (await checkAuthorization(role)) {
+			const doc = await deleteAsAdmin(req.params.id);
+			return res.status(200).json(doc);
+		}
+		if (await isOwner(req.params.id, userId)) {
+			const doc = await deleteAsUser(req.params.id, userId);
+			return res.status(200).json(doc);
+		}
+	} catch (error) {
+		return res.status(403).json(error);
+	}
 };
 
-const delToDo = async (req, res) => {
-  try {
-    const { userId, role } = req.user;
-
-    if (await checkAuthorization(role)) {
-      const doc = await deleteToDoAdmin(req.params.id);
-      return res.status(200).json(doc);
-    } else {
-      const doc = await deleteToDoUser(req.params.id, userId);
-      return res.status(200).json(doc);
-    }
-  } catch (error) {
-    return res.status(403).json(error);
-  }
+const toDoWithItems = async (req, res) => {
+	try {
+		const { userId, role } = req.user;
+		const { id } = req.params;
+		if (await checkAuthorization(role)) {
+			const doc = await getTodoItems({});
+			return res.status(200).json(doc);
+		}
+		if (await isOwner(req.params.id, userId)) {
+			const doc = await getTodoItems({ toDoId: id });
+			return res.status(200).json(doc);
+		}
+	} catch (error) {
+		return res.status(403).json(error);
+	}
 };
 
-const sortCreate = async (req, res) => {
-  try {
-    const { userId, role } = req.user;
-    if (await checkAuthorization(role)) {
-      const doc = await sortByCreatedAdmin(req.params.order);
-      return res.status(200).json(doc);
-    } else {
-      const doc = await sortByCreatedUser(req.params.order, userId);
-      return res.status(200).json(doc);
-    }
-  } catch (error) {}
-  return res.status(403).json(error);
-};
-
-const sortUpdated = async (req, res) => {
-  try {
-    const { userId, role } = req.user;
-    if (await checkAuthorization(role)) {
-      const doc = await sortByUpdatedAdmin(req.params.order);
-      return res.status(200).json(doc);
-    } else {
-      const doc = await sortByUpdatedUser(req.params.order, userId);
-      return res.status(200).json(doc);
-    }
-  } catch (error) {}
-  return res.status(403).json(error);
-};
-
-const paginate = async (req, res) => {
-  try {
-    const { userId, role } = req.user;
-    let perPage = 5;
-    let skip = Math.max(0, req.params.skip);
-
-    if (await checkAuthorization(role)) {
-      const doc = await limitPaginateAdmin(perPage, skip);
-      return res.status(200).json(doc);
-    } else {
-      const doc = await limitPaginateUser(perPage, skip, userId);
-      return res.status(200).json(doc);
-    }
-  } catch {
-    return res.status(403).json(error);
-  }
-};
-
-const checkAuthorization = async (role) => {
-  console.log("role: " + role);
-  if (role === "admin") {
-    return true;
-  } else {
-    return false;
-  }
+const update = async (req, res) => {
+	try {
+		const { title } = req.body;
+		const { userId, role } = req.user;
+		console.log('inside update');
+		if (await checkAuthorization(role)) {
+			console.log('admin update');
+			const doc = await updateTodo(req.params.id, title);
+			return res.status(200).json(doc);
+		} else if (await isOwner(req.params.id, userId)) {
+			console.log('user update');
+			const doc = await updateTodo(req.params.id, title);
+			return res.status(200).json(doc);
+		}
+	} catch (error) {
+		return res.status(403).json(error);
+	}
 };
 
 module.exports = {
-  createToDo,
-  getToDos,
-  updToDo,
-  delToDo,
-  sortCreate,
-  sortUpdated,
-  paginate,
+	create,
+	get,
+	del,
+	toDoWithItems,
+	update,
 };
