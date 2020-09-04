@@ -1,162 +1,99 @@
-const { toDoCollection, testToDoCollection } = require("../database/dataBase");
+const {
+	insertToDo,
+	getAsAdmin,
+	getAsUser,
+	deleteAsAdmin,
+	deleteAsUser,
+	checkAuthorization,
+	isOwner,
+	updateTodo,
+	getTodoItems,
+} = require('../models/toDoModel');
 
-const insertToDo = async (title, done, userId) => {
-  const doc = await toDoCollection.insert({
-    title,
-    done,
-    userId,
-    created: new Date().toLocaleString(),
-  });
-  return doc;
+const create = async (req, res) => {
+	try {
+		const { title } = req.body;
+		const doc = await insertToDo(title, req.user.userId);
+
+		return res.status(200).json(doc);
+	} catch (error) {
+		return res.status(403).json(error);
+	}
 };
 
-const findToDosAdmin = async () => {
-  const doc = await toDoCollection.find({}).limit(5).sort({ created: -1 });
-  return doc;
+const get = async (req, res) => {
+	try {
+		const { userId, role } = req.user;
+
+		if (await checkAuthorization(role)) {
+			const doc = await getAsAdmin();
+			return res.status(200).json(doc);
+		} else {
+			const doc = await getAsUser(userId);
+			return res.status(200).json(doc);
+		}
+	} catch (error) {
+		return res.status(403).json(error);
+	}
 };
 
-const findToDosUser = async (id) => {
-  const doc = await toDoCollection
-    .find({ userId: id })
-    .limit(5)
-    .sort({ created: -1 });
-  return doc;
+const del = async (req, res) => {
+	try {
+		const { userId, role } = req.user;
+
+		if (await checkAuthorization(role)) {
+			const doc = await deleteAsAdmin(req.params.id);
+			return res.status(200).json(doc);
+		}
+		if (await isOwner(req.params.id, userId)) {
+			const doc = await deleteAsUser(req.params.id, userId);
+			return res.status(200).json(doc);
+		}
+	} catch (error) {
+		return res.status(403).json(error);
+	}
 };
 
-const updateToDoAdmin = async (postId, title, done) => {
-  const item = await toDoCollection.findOne({ _id: postId });
-  const doc = await toDoCollection.update(
-    { _id: postId },
-    {
-      $set: {
-        title,
-        done,
-        created: item.created,
-        lastUpdated: new Date().toLocaleString(),
-      },
-    },
-    {}
-  );
-  return doc;
+const toDoWithItems = async (req, res) => {
+	try {
+		const { userId, role } = req.user;
+		const { id } = req.params;
+		if (await checkAuthorization(role)) {
+			const doc = await getTodoItems({});
+			return res.status(200).json(doc);
+		}
+		if (await isOwner(req.params.id, userId)) {
+			const doc = await getTodoItems({ toDoId: id });
+			return res.status(200).json(doc);
+		}
+	} catch (error) {
+		return res.status(403).json(error);
+	}
 };
 
-const updateToDoUser = async (postId, title, done, userId) => {
-  const item = await toDoCollection.findOne({ _id: postId });
-  const isOwner = await ownerOfPost(item, userId);
-  if (isOwner) {
-    const doc = await toDoCollection.update(
-      { _id: postId },
-      {
-        $set: {
-          title,
-          done,
-          created: item.created,
-          lastUpdated: new Date().toLocaleString(),
-        },
-      },
-      {}
-    );
-    return doc;
-  }
-};
-
-const deleteToDoAdmin = async (postId) => {
-  const doc = await toDoCollection.remove({ _id: postId });
-  return doc;
-};
-
-const deleteToDoUser = async (postId, userId) => {
-  const item = await toDoCollection.findOne({ _id: postId });
-  const isOwner = await ownerOfPost(item, userId);
-
-  if (isOwner) {
-    const doc = await toDoCollection.remove({ _id: postId });
-    return doc;
-  }
-};
-
-const sortByCreatedAdmin = async (order) => {
-  const doc = await toDoCollection
-    .find({})
-    .sort({ created: order })
-    .limit(5)
-    .exec();
-  return doc;
-};
-
-const sortByCreatedUser = async (order, userId) => {
-  const doc = await toDoCollection
-    .find({ userId: userId })
-    .sort({ created: order })
-    .limit(5)
-    .exec();
-  return doc;
-};
-
-const sortByUpdatedAdmin = async (order) => {
-  const doc = await toDoCollection
-    .find({})
-    .sort({ lastUpdated: order })
-    .limit(5)
-    .exec();
-  return doc;
-};
-
-const sortByUpdatedUser = async (order, userId) => {
-  const doc = await toDoCollection
-    .find({ userId: userId })
-    .sort({ lastUpdated: order })
-    .limit(5)
-    .exec();
-  return doc;
-};
-
-const limitPaginateAdmin = async (perPage, skip) => {
-  const doc = await toDoCollection
-    .find({})
-    .sort({ created: -1 })
-    .skip(perPage * skip)
-    .limit(perPage)
-    .exec();
-  return doc;
-};
-
-const limitPaginateUser = async (perPage, skip, userId) => {
-  const doc = await toDoCollection
-    .find({ userId: userId })
-    .sort({ created: -1 })
-    .skip(perPage * skip)
-    .limit(perPage)
-    .exec();
-  return doc;
-};
-
-const ownerOfPost = async (item, userId) => {
-  console.log("Owner of post: ");
-  console.log(item.userId === userId);
-  return item.userId === userId;
-};
-
-const ownerOfPost2 = async (userId) => {
-  const item = await toDoCollection.findOne({ userId: userId });
-  console.log("Owner of post: ");
-  console.log(item.userId === userId);
-  return item.userId === userId;
+const update = async (req, res) => {
+	try {
+		const { title } = req.body;
+		const { userId, role } = req.user;
+		console.log('inside update');
+		if (await checkAuthorization(role)) {
+			console.log('admin update');
+			const doc = await updateTodo(req.params.id, title);
+			return res.status(200).json(doc);
+		} else if (await isOwner(req.params.id, userId)) {
+			console.log('user update');
+			const doc = await updateTodo(req.params.id, title);
+			return res.status(200).json(doc);
+		}
+	} catch (error) {
+		return res.status(403).json(error);
+	}
 };
 
 module.exports = {
-  insertToDo,
-  findToDosAdmin,
-  findToDosUser,
-  updateToDoAdmin,
-  updateToDoUser,
-  deleteToDoAdmin,
-  deleteToDoUser,
-  sortByCreatedAdmin,
-  sortByCreatedUser,
-  sortByUpdatedAdmin,
-  sortByUpdatedUser,
-  limitPaginateAdmin,
-  limitPaginateUser,
-  ownerOfPost2,
+	create,
+	get,
+	del,
+	toDoWithItems,
+	update,
 };
