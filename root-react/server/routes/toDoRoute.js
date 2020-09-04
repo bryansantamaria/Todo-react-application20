@@ -1,23 +1,12 @@
-const { Router } = require("express");
-const {
-  createToDo,
-  getToDos,
-  updToDo,
-  delToDo,
-  sortCreate,
-  sortUpdated,
-  paginate,
-} = require("../controllers/toDoController");
-const { authenticate } = require("../middlewares/auth");
-
+const { Router } = require('express');
 const router = new Router();
+const { get, create, del, toDoWithItems, update } = require('../controllers/toDoController');
+const { authenticate } = require('../middlewares/auth');
 
-router.get("/", authenticate, getToDos);
-router.post("/create", authenticate, createToDo);
-router.patch("/update/:id", authenticate, updToDo);
-router.delete("/delete/:id", authenticate, delToDo);
-router.get("/sort/created:order", authenticate, sortCreate);
-router.get("/sort/lastUpdated:order", authenticate, sortUpdated);
-router.get("/limit/:skip", authenticate, paginate);
+router.get('/', authenticate, get);
+router.get('/:id/items', authenticate, toDoWithItems);
+router.post('/create', authenticate, create);
+router.delete('/:id/delete', authenticate, del);
+router.patch('/:id/update', authenticate, update);
 
 module.exports = router;
