@@ -17,6 +17,7 @@ import {
 	delItem,
 	getUser,
 	updateCompleted,
+	getToDoWithItems,
 } from './utils/api';
 
 import ItemContainer from './components/ToDoContainer';
@@ -26,7 +27,10 @@ class App extends Component {
 		super(props);
 		this.state = {
 			todos: [],
+			toDoItems: [],
+			toDoId: '',
 			items: [],
+			selectedTodo: '',
 			selectedItem: null,
 			inputField: '',
 			editBtnState: false,
@@ -47,8 +51,12 @@ class App extends Component {
 				const toDo = await getToDo('http://localhost:8080/todos/', this.state.token);
 				const items = await getItems('http://localhost:8080/items/', this.state.token);
 				const user = await getUser('http://localhost:8080/users', this.state.token);
-				this.setState({ todos: toDo.data, items: items.data, users: user.data });
-				console.log(this.state.todos);
+				this.setState({
+					todos: toDo.data,
+					toDoItems: items.data,
+					users: user.data,
+					toDoId: toDo.data[0]._id,
+				});
 				window.localStorage.setItem('role', user.data.role);
 			}
 		} catch (error) {
@@ -58,15 +66,29 @@ class App extends Component {
 	}
 
 	createToDo = async (title) => {
-		const res = await postToDo('http://localhost:8080/toDos/create', title, this.state.token);
+		const res = await postToDo('http://localhost:8080/todos/create', title, this.state.token);
 		console.log(res);
 		this.setState({ todos: [...this.state.todos, res.data] });
 	};
 
+	getToDo = async (id) => {
+		const res = await getToDoWithItems(`http://localhost:8080/todos/${id}/items`, this.state.token);
+		this.setState({ toDoItems: res.data, toDoId: id });
+		console.log(this.state.toDoItems);
+		console.log(this.state.toDoId);
+	};
+
 	//Body posts title & done, then recieves data from end point and updates state.
 	createItem = async (title) => {
-		const res = await postItem('http://localhost:8080/items/create', title, this.state.token);
-		this.setState({ items: [...this.state.items, res.data] });
+		const res = await postItem(
+			'http://localhost:8080/items/create',
+			title,
+			this.state.toDoId,
+			this.state.token
+		);
+		console.log(this.state.toDoId);
+		this.setState({ toDoItems: [...this.state.toDoItems, res.data] });
+		console.log(this.state.toDoItems);
 	};
 
 	//Copy current items array, filter out item being deleted and update state.
@@ -259,6 +281,8 @@ class App extends Component {
 								users={this.state.users}
 								items={this.state.items}
 								todos={this.state.todos}
+								toDoItems={this.state.toDoItems}
+								getToDoWithId={this.getToDo}
 								createToDo={this.createToDo}
 								complete={this.complete}
 								delete={this.delete}
