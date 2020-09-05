@@ -1,4 +1,135 @@
-const {
+const { itemCollection } = require('../database/dataBase');
+
+const insertItem = async (title, done, userId, toDoId) => {
+	const doc = await itemCollection.insert({
+		title,
+		done,
+		userId,
+		toDoId,
+		created: new Date().toLocaleString(),
+	});
+	return doc;
+};
+
+const findAsAdmin = async () => {
+	const doc = await itemCollection.find({}).limit(5).sort({ created: -1 });
+	return doc;
+};
+
+const findAsUser = async (id) => {
+	const doc = await itemCollection.find({ userId: id }).limit(5).sort({ created: -1 });
+	return doc;
+};
+
+const updateAsAdmin = async (postId, title, done) => {
+	const doc = await itemCollection.update(
+		{ _id: postId },
+		{
+			$set: {
+				title,
+				done,
+				lastUpdated: new Date().toLocaleString(),
+			},
+		},
+		{}
+	);
+	return doc;
+};
+
+const updateAsUser = async (postId, title, done) => {
+	const doc = await itemCollection.update(
+		{ _id: postId },
+		{
+			$set: {
+				title,
+				done,
+				lastUpdated: new Date().toLocaleString(),
+			},
+		},
+		{}
+	);
+	return doc;
+};
+
+const deleteAsAdmin = async (postId) => {
+	const doc = await itemCollection.remove({ _id: postId });
+	return doc;
+};
+
+const deleteAsUser = async (postId) => {
+	const doc = await itemCollection.remove({ _id: postId });
+	return doc;
+};
+
+const sortByCreatedAdmin = async (order) => {
+	const doc = await itemCollection.find({}).sort({ created: order }).limit(5).exec();
+	return doc;
+};
+
+const sortByCreatedUser = async (order, userId) => {
+	const doc = await itemCollection
+		.find({ userId: userId })
+		.sort({ created: order })
+		.limit(5)
+		.exec();
+	return doc;
+};
+
+const sortByUpdatedAdmin = async (order) => {
+	const doc = await itemCollection.find({}).sort({ lastUpdated: order }).limit(5).exec();
+	return doc;
+};
+
+const sortByUpdatedUser = async (order, userId) => {
+	const doc = await itemCollection
+		.find({ userId: userId })
+		.sort({ lastUpdated: order })
+		.limit(5)
+		.exec();
+	return doc;
+};
+
+const limitPaginateAdmin = async (perPage, skip) => {
+	const doc = await itemCollection
+		.find({})
+		.sort({ created: -1 })
+		.skip(perPage * skip)
+		.limit(perPage)
+		.exec();
+	return doc;
+};
+
+const limitPaginateUser = async (perPage, skip, userId) => {
+	const doc = await itemCollection
+		.find({ userId: userId })
+		.sort({ created: -1 })
+		.skip(perPage * skip)
+		.limit(perPage)
+		.exec();
+	return doc;
+};
+
+const isOwner = async (postId, userId) => {
+	const todoItem = await itemCollection.findOne({ _id: postId });
+
+	return todoItem.userId === userId;
+};
+
+const checkAuthorization = async (role) => {
+	console.log('role: ' + role);
+	if (role === 'admin') {
+		return true;
+	} else {
+		return false;
+	}
+};
+
+const clear = async () => {
+	const doc = await itemCollection.remove({}, { multi: true });
+	return doc;
+};
+
+module.exports = {
 	insertItem,
 	findAsAdmin,
 	findAsUser,
@@ -12,124 +143,7 @@ const {
 	sortByUpdatedUser,
 	limitPaginateAdmin,
 	limitPaginateUser,
-	checkAuthorization,
 	isOwner,
-} = require('../models/itemModel');
-
-const createItem = async (req, res) => {
-	try {
-		const { title, done, toDoId } = req.body;
-		const doc = await insertItem(title, done, req.user.userId, toDoId);
-
-		return res.status(200).json(doc);
-	} catch (error) {
-		return res.status(403).json(error);
-	}
-};
-
-const getItems = async (req, res) => {
-	try {
-		const { userId, role } = req.user;
-
-		console.log('Enter getItems');
-		if (await checkAuthorization(role)) {
-			const doc = await findAsAdmin();
-			// console.log(doc);
-			return res.status(200).json(doc);
-		} else {
-			const doc = await findAsUser(userId);
-			return res.status(200).json(doc);
-		}
-	} catch (error) {
-		return res.status(403).json(error);
-	}
-};
-
-const updItems = async (req, res) => {
-	try {
-		const { title, done } = req.body;
-		const { userId, role } = req.user;
-
-		if (await checkAuthorization(role)) {
-			const doc = await updateAsAdmin(req.params.id, title, done);
-			return res.status(200).json(doc);
-		} else if (await isOwner(req.params.id, userId)) {
-			const doc = await updateAsUser(req.params.id, title, done, userId);
-			return res.status(200).json(doc);
-		}
-	} catch (error) {
-		return res.status(403).json(error);
-	}
-};
-
-const delItems = async (req, res) => {
-	try {
-		const { userId, role } = req.user;
-
-		if (await checkAuthorization(role)) {
-			const doc = await deleteAsAdmin(req.params.id);
-			return res.status(200).json(doc);
-		} else if (await isOwner(req.params.id, userId)) {
-			const doc = await deleteAsUser(req.params.id, userId);
-			return res.status(200).json(doc);
-		}
-	} catch (error) {
-		return res.status(403).json(error);
-	}
-};
-
-const sortCreate = async (req, res) => {
-	try {
-		const { userId, role } = req.user;
-		if (await checkAuthorization(role)) {
-			const doc = await sortByCreatedAdmin(req.params.order);
-			return res.status(200).json(doc);
-		} else {
-			const doc = await sortByCreatedUser(req.params.order, userId);
-			return res.status(200).json(doc);
-		}
-	} catch (error) {}
-	return res.status(403).json(error);
-};
-
-const sortUpdated = async (req, res) => {
-	try {
-		const { userId, role } = req.user;
-		if (await checkAuthorization(role)) {
-			const doc = await sortByUpdatedAdmin(req.params.order);
-			return res.status(200).json(doc);
-		} else {
-			const doc = await sortByUpdatedUser(req.params.order, userId);
-			return res.status(200).json(doc);
-		}
-	} catch (error) {}
-	return res.status(403).json(error);
-};
-
-const paginate = async (req, res) => {
-	try {
-		const { userId, role } = req.user;
-		let perPage = 5;
-		let skip = Math.max(0, req.params.skip);
-
-		if (await checkAuthorization(role)) {
-			const doc = await limitPaginateAdmin(perPage, skip);
-			return res.status(200).json(doc);
-		} else {
-			const doc = await limitPaginateUser(perPage, skip, userId);
-			return res.status(200).json(doc);
-		}
-	} catch {
-		return res.status(403).json(error);
-	}
-};
-
-module.exports = {
-	createItem,
-	getItems,
-	updItems,
-	delItems,
-	sortCreate,
-	sortUpdated,
-	paginate,
+	checkAuthorization,
+	clear,
 };
