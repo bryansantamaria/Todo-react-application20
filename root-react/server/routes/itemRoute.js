@@ -16,8 +16,8 @@ router.get('/', authenticate, getItems);
 router.post('/create', authenticate, createItem);
 router.patch('/update/:id', authenticate, updItems);
 router.delete('/delete/:id', authenticate, delItems);
-router.get('/sort/created:order', authenticate, sortCreate);
-router.get('/sort/lastUpdated:order', authenticate, sortUpdated);
-router.get('/limit/:skip', authenticate, paginate);
+router.get('/sort/created/:order&:toDoId', authenticate, sortCreate);
+router.get('/sort/lastUpdated:order&:toDoId', authenticate, sortUpdated);
+router.get('/limit/:skip&:toDoId', authenticate, paginate);
 
 module.exports = router;
