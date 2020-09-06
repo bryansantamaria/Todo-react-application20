@@ -12,19 +12,14 @@ const insertItem = async (title, done, userId, toDoId) => {
 };
 
 const findAsAdmin = async () => {
-	const toDo = await toDoCollection.find({}).limit(5).sort({ created: -1 });
-	console.log(toDo);
+	const toDo = await toDoCollection.find({}).sort({ created: -1 });
 	const doc = await itemCollection.find({ toDoId: toDo[0]._id }).limit(5).sort({ created: -1 });
-	console.log(doc);
 	return doc;
 };
 
 const findAsUser = async (id) => {
-	console.log('ENTER FIND AS USER:');
-	const toDo = await toDoCollection.find({ userId: id }).limit(5).sort({ created: -1 });
-	console.log(toDo[0]._id);
+	const toDo = await toDoCollection.find({ userId: id }).sort({ created: -1 });
 	const doc = await itemCollection.find({ toDoId: toDo[0]._id }).limit(5).sort({ created: -1 });
-	console.log(doc);
 	return doc;
 };
 
@@ -68,47 +63,35 @@ const deleteAsUser = async (postId) => {
 	return doc;
 };
 
-const sortByCreatedAdmin = async (order) => {
-	const doc = await itemCollection.find({}).sort({ created: order }).limit(5).exec();
+const getToDoId = async (id, toDoId) => {
+	console.log('ENTERING TO DO ID');
+	console.log(toDoId);
+	const doc = await toDoCollection.findOne({ _id: toDoId });
+	console.log(doc);
 	return doc;
 };
 
-const sortByCreatedUser = async (order, userId) => {
+const sortByCreated = async (order, toDoId) => {
 	const doc = await itemCollection
-		.find({ userId: userId })
+		.find({ toDoId: toDoId })
 		.sort({ created: order })
 		.limit(5)
 		.exec();
 	return doc;
 };
 
-const sortByUpdatedAdmin = async (order) => {
-	const doc = await itemCollection.find({}).sort({ lastUpdated: order }).limit(5).exec();
-	return doc;
-};
-
-const sortByUpdatedUser = async (order, userId) => {
+const sortByUpdated = async (order, toDoId) => {
 	const doc = await itemCollection
-		.find({ userId: userId })
+		.find({ toDoId: toDoId })
 		.sort({ lastUpdated: order })
 		.limit(5)
 		.exec();
 	return doc;
 };
 
-const limitPaginateAdmin = async (perPage, skip) => {
+const limitPagination = async (perPage, skip, toDoId) => {
 	const doc = await itemCollection
-		.find({})
-		.sort({ created: -1 })
-		.skip(perPage * skip)
-		.limit(perPage)
-		.exec();
-	return doc;
-};
-
-const limitPaginateUser = async (perPage, skip, userId) => {
-	const doc = await itemCollection
-		.find({ userId: userId })
+		.find({ toDoId: toDoId })
 		.sort({ created: -1 })
 		.skip(perPage * skip)
 		.limit(perPage)
@@ -144,13 +127,11 @@ module.exports = {
 	updateAsUser,
 	deleteAsAdmin,
 	deleteAsUser,
-	sortByCreatedAdmin,
-	sortByCreatedUser,
-	sortByUpdatedAdmin,
-	sortByUpdatedUser,
-	limitPaginateAdmin,
-	limitPaginateUser,
+	sortByCreated,
+	sortByUpdated,
+	limitPagination,
 	isOwner,
 	checkAuthorization,
+	getToDoId,
 	clear,
 };
