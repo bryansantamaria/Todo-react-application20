@@ -49,14 +49,15 @@ class App extends Component {
 		try {
 			if (this.state.token) {
 				const toDo = await getToDo('http://localhost:8080/todos/', this.state.token);
-				const items = await getItems('http://localhost:8080/items/', this.state.token);
+				const toDoItems = await getItems('http://localhost:8080/items/', this.state.token);
 				const user = await getUser('http://localhost:8080/users', this.state.token);
 				this.setState({
 					todos: toDo.data,
-					toDoItems: items.data,
+					toDoItems: toDoItems.data,
 					users: user.data,
 					toDoId: toDo.data[0]._id,
 				});
+				console.log(this.state.toDoItems);
 				window.localStorage.setItem('role', user.data.role);
 			}
 		} catch (error) {
@@ -93,49 +94,55 @@ class App extends Component {
 
 	//Copy current items array, filter out item being deleted and update state.
 	delete = async (id) => {
-		const ItemList = [...this.state.items];
+		const ItemList = [...this.state.toDoItems];
 		const newItems = ItemList.filter((Item) => Item._id !== id);
 		await delItem(`http://localhost:8080/items/delete/${id}`, this.state.token);
-		this.setState({ items: newItems });
+		this.setState({ toDoItems: newItems });
 	};
 
 	update = async (title) => {
+		console.log(title);
 		await patchItem(
 			`http://localhost:8080/items/update/${this.state.selectedItem}`,
 			title,
 			this.state.token
 		);
-		const index = this.state.items.findIndex((Item) => Item._id === this.state.selectedItem);
-		const oldState = [...this.state.items];
+		console.log(this.state.toDoItems);
+		console.log(this.state.selectedItem);
+		const index = this.state.toDoItems.findIndex((Item) => Item._id === this.state.selectedItem);
+		const oldState = [...this.state.toDoItems];
 		oldState[index].title = title;
 
 		this.setState({
-			items: oldState,
+			toDoItems: oldState,
 			selectedItem: null,
 		});
 	};
 
 	orderByCreated = async () => {
+		console.log(this.state.toggleCreateOrder);
 		if (this.state.toggleCreateOrder) {
+			// {comment: this.comment, id: this.postId}
+			console.log(this.state.toDoId);
 			const res = await getOrderBy(
-				`http://localhost:8080/items/sort/created${-1}`,
+				`http://localhost:8080/items/sort/created/${-1}&${this.state.toDoId}`,
 				this.state.token
 			);
-			let oldState = [...this.state.items];
+			let oldState = [...this.state.toDoItems];
 			oldState = res.data;
 			this.setState({
-				items: oldState,
+				toDoItems: oldState,
 				toggleCreateOrder: false,
 			});
 		} else if (!this.state.toggleCreateOrder) {
 			const res = await getOrderBy(
-				`http://localhost:8080/items/sort/created${1}`,
+				`http://localhost:8080/items/sort/created/${1}&${this.state.toDoId}`,
 				this.state.token
 			);
-			let oldState = [...this.state.items];
+			let oldState = [...this.state.toDoItems];
 			oldState = res.data;
 			this.setState({
-				items: oldState,
+				toDoItems: oldState,
 				toggleCreateOrder: true,
 			});
 		}
@@ -144,31 +151,31 @@ class App extends Component {
 	orderByUpdated = () => {
 		if (this.state.toggleUpdatedOrder) {
 			axios
-				.get(`http://localhost:8080/items/sort/lastUpdated${-1}`, {
+				.get(`http://localhost:8080/items/sort/lastUpdated${-1}&${this.state.toDoId}`, {
 					headers: {
 						Authorization: 'Bearer ' + this.state.token,
 					},
 				})
 				.then((res) => {
-					let oldState = [...this.state.items];
+					let oldState = [...this.state.toDoItems];
 					oldState = res.data;
 					this.setState({
-						items: oldState,
+						toDoItems: oldState,
 						toggleUpdatedOrder: false,
 					});
 				});
 		} else if (!this.state.toggleUpdatedOrder) {
 			axios
-				.get(`http://localhost:8080/items/sort/lastUpdated${1}`, {
+				.get(`http://localhost:8080/items/sort/lastUpdated${1}&${this.state.toDoId}`, {
 					headers: {
 						Authorization: 'Bearer ' + this.state.token,
 					},
 				})
 				.then((res) => {
-					let oldState = [...this.state.items];
+					let oldState = [...this.state.toDoItems];
 					oldState = res.data;
 					this.setState({
-						items: oldState,
+						toDoItems: oldState,
 						toggleUpdatedOrder: true,
 					});
 				});
@@ -177,16 +184,16 @@ class App extends Component {
 
 	paginateFwrd = () => {
 		axios
-			.get(`http://localhost:8080/items/limit/${this.limit}`, {
+			.get(`http://localhost:8080/items/limit/${this.limit}&${this.state.toDoId}`, {
 				headers: {
 					Authorization: 'Bearer ' + this.state.token,
 				},
 			})
 			.then((res) => {
-				let oldState = [...this.state.items];
+				let oldState = [...this.state.toDoItems];
 				oldState = res.data;
 				this.setState({
-					items: oldState,
+					toDoItems: oldState,
 				});
 			});
 		this.limit++;
@@ -197,22 +204,23 @@ class App extends Component {
 			this.limit--;
 		}
 		axios
-			.get(`http://localhost:8080/items/limit/${this.limit}`, {
+			.get(`http://localhost:8080/items/limit/${this.limit}&${this.state.toDoId}`, {
 				headers: {
 					Authorization: 'Bearer ' + this.state.token,
 				},
 			})
 			.then((res) => {
-				let oldState = [...this.state.items];
+				let oldState = [...this.state.toDoItems];
 				oldState = res.data;
 				this.setState({
-					items: oldState,
+					toDoItems: oldState,
 				});
 			});
 	};
 
 	selectItem = (id) => {
-		const editItem = this.state.items.find((Item) => Item._id === id);
+		console.log(id);
+		const editItem = this.state.toDoItems.find((Item) => Item._id === id);
 		this.setState({
 			selectedItem: id,
 			inputField: editItem.title,
@@ -228,15 +236,15 @@ class App extends Component {
 
 	complete = async (id) => {
 		this.setState({
-			items: this.state.items.map((Item) => {
+			toDoItems: this.state.toDoItems.map((Item) => {
 				if (Item._id === id) {
 					Item.done = !Item.done;
 				}
 				return Item;
 			}),
 		});
-		const index = this.state.items.findIndex((Item) => Item._id === id);
-		const { title, done } = this.state.items[index];
+		const index = this.state.toDoItems.findIndex((Item) => Item._id === id);
+		const { title, done } = this.state.toDoItems[index];
 		await updateCompleted(
 			`http://localhost:8080/items/update/${id}`,
 			title,
