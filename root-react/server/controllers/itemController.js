@@ -6,13 +6,11 @@ const {
 	updateAsUser,
 	deleteAsAdmin,
 	deleteAsUser,
-	sortByCreatedAdmin,
-	sortByCreatedUser,
-	sortByUpdatedAdmin,
-	sortByUpdatedUser,
-	limitPaginateAdmin,
-	limitPaginateUser,
+	sortByCreated,
+	sortByUpdated,
+	limitPagination,
 	checkAuthorization,
+	getToDoId,
 	isOwner,
 } = require('../models/itemModel');
 
@@ -30,17 +28,11 @@ const createItem = async (req, res) => {
 const getItems = async (req, res) => {
 	try {
 		const { userId, role } = req.user;
-
-		console.log('Enter getItems');
-		console.log(req.user);
 		if (await checkAuthorization(role)) {
 			const doc = await findAsAdmin();
-			// console.log(doc);
 			return res.status(200).json(doc);
 		} else {
-			console.log('I AM MORTAL');
 			const doc = await findAsUser(userId);
-			console.log(doc);
 			return res.status(200).json(doc);
 		}
 	} catch (error) {
@@ -84,11 +76,12 @@ const delItems = async (req, res) => {
 const sortCreate = async (req, res) => {
 	try {
 		const { userId, role } = req.user;
+		const toDoId = await getToDoId(userId, req.params.toDoId);
 		if (await checkAuthorization(role)) {
-			const doc = await sortByCreatedAdmin(req.params.order);
+			const doc = await sortByCreated(req.params.order, toDoId._id);
 			return res.status(200).json(doc);
 		} else {
-			const doc = await sortByCreatedUser(req.params.order, userId);
+			const doc = await sortByCreated(req.params.order, toDoId._id);
 			return res.status(200).json(doc);
 		}
 	} catch (error) {}
@@ -98,11 +91,12 @@ const sortCreate = async (req, res) => {
 const sortUpdated = async (req, res) => {
 	try {
 		const { userId, role } = req.user;
+		const toDoId = await getToDoId(userId, req.params.toDoId);
 		if (await checkAuthorization(role)) {
-			const doc = await sortByUpdatedAdmin(req.params.order);
+			const doc = await sortByUpdated(req.params.order, toDoId._id);
 			return res.status(200).json(doc);
 		} else {
-			const doc = await sortByUpdatedUser(req.params.order, userId);
+			const doc = await sortByUpdated(req.params.order, toDoId._id);
 			return res.status(200).json(doc);
 		}
 	} catch (error) {}
@@ -114,12 +108,12 @@ const paginate = async (req, res) => {
 		const { userId, role } = req.user;
 		let perPage = 5;
 		let skip = Math.max(0, req.params.skip);
-
+		const toDoId = await getToDoId(userId, req.params.toDoId);
 		if (await checkAuthorization(role)) {
-			const doc = await limitPaginateAdmin(perPage, skip);
+			const doc = await limitPagination(perPage, skip, toDoId._id);
 			return res.status(200).json(doc);
 		} else {
-			const doc = await limitPaginateUser(perPage, skip, userId);
+			const doc = await limitPagination(perPage, skip, toDoId._id);
 			return res.status(200).json(doc);
 		}
 	} catch {
