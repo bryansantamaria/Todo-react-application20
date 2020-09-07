@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Checkbox, TableCell, TableRow } from '@material-ui/core';
 
-class ItemItem extends Component {
+class ToDoItem extends Component {
 	state = {};
 
 	getLineThrough = () => {
@@ -61,4 +61,4 @@ class ItemItem extends Component {
 	}
 }
 
-export default ItemItem;
+export default ToDoItem;
