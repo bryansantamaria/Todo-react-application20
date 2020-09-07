@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ItemItem from './ToDoItem';
+import ToDoItem from './ToDoItem';
 import CreateItem from './CreateItem';
 import CreateToDo from './CreateTodo';
 import {
@@ -14,7 +14,7 @@ import {
 } from '@material-ui/core';
 
 class ItemContainer extends Component {
-	state = { value: '' };
+	state = { value: '', toDoId: '' };
 
 	toggleCreatedArrow = () => {
 		return this.props.toggleCreateOrder ? (
@@ -43,10 +43,16 @@ class ItemContainer extends Component {
 			<span></span>
 		);
 	};
-	handleChange = (e) => {
+	handleSelectedToDo = (e) => {
+		let select = document.getElementById('select');
+		var options = select.options;
+		var id = options[options.selectedIndex].id;
+		this.props.getToDoWithId(id);
 		this.setState({
 			value: e.target.value,
+			toDoId: id,
 		});
+		return id;
 	};
 
 	render() {
@@ -64,10 +70,15 @@ class ItemContainer extends Component {
 					<div id='selectContainer'>
 						<label htmlFor='select' id='selectLabel'>
 							Select Todo-list
-							<NativeSelect id='select' value={this.state.value} onChange={this.handleChange}>
-								<option aria-label='None' value='Select to do list' />
+							<NativeSelect
+								id='select'
+								value={this.state.title}
+								onChange={this.handleSelectedToDo}
+								selected='selected'
+							>
+								{' '}
 								{this.props.todos.map((todo) => (
-									<option key={todo._id} value={todo.title}>
+									<option key={todo._id} value={todo.title} id={todo._id}>
 										{todo.title}
 									</option>
 								))}
@@ -105,8 +116,8 @@ class ItemContainer extends Component {
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								{this.props.items.map((Item) => (
-									<ItemItem
+								{this.props.toDoItems.map((Item) => (
+									<ToDoItem
 										key={Item._id}
 										Item={Item}
 										complete={this.props.complete}
@@ -117,7 +128,7 @@ class ItemContainer extends Component {
 							</TableBody>
 						</Table>
 						<div className='bottomNavigator'>
-							<span className='paginationSpan'>{this.props.items.length} items</span>
+							<span className='paginationSpan'>{this.props.toDoItems.length} items</span>
 							<button type='button' className='paginationBtn' onClick={this.props.paginateFwrd}>
 								&rarr;
 							</button>
