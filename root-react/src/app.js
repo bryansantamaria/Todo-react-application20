@@ -18,9 +18,10 @@ import {
 	getUser,
 	updateCompleted,
 	getToDoWithItems,
+	delToDo,
 } from './utils/api';
 
-import ItemContainer from './components/ToDoContainer';
+import ToDoContainer from './components/ToDoContainer';
 
 class App extends Component {
 	constructor(props) {
@@ -29,7 +30,6 @@ class App extends Component {
 			todos: [],
 			toDoItems: [],
 			toDoId: '',
-			items: [],
 			selectedTodo: '',
 			selectedItem: null,
 			inputField: '',
@@ -48,35 +48,56 @@ class App extends Component {
 		console.log('component did mount');
 		try {
 			if (this.state.token) {
+				const user = await getUser('http://localhost:8080/users', this.state.token);
+				this.setState({ users: user.data });
+				window.localStorage.setItem('role', user.data.role);
+			}
+		} catch (err) {
+			console.log(err);
+		}
+		try {
+			if (this.state.token) {
 				const toDo = await getToDo('http://localhost:8080/todos/', this.state.token);
 				const toDoItems = await getItems('http://localhost:8080/items/', this.state.token);
-				const user = await getUser('http://localhost:8080/users', this.state.token);
 				this.setState({
 					todos: toDo.data,
 					toDoItems: toDoItems.data,
-					users: user.data,
 					toDoId: toDo.data[0]._id,
 				});
+				console.log(this.state.todos);
 				console.log(this.state.toDoItems);
-				window.localStorage.setItem('role', user.data.role);
 			}
 		} catch (error) {
-			console.log('ERROR');
-			console.log(error);
+			console.log('ERR');
 		}
 	}
 
 	createToDo = async (title) => {
 		const res = await postToDo('http://localhost:8080/todos/create', title, this.state.token);
-		console.log(res);
 		this.setState({ todos: [...this.state.todos, res.data] });
 	};
 
 	getToDo = async (id) => {
+		console.log('GET TODOS');
 		const res = await getToDoWithItems(`http://localhost:8080/todos/${id}/items`, this.state.token);
 		this.setState({ toDoItems: res.data, toDoId: id });
-		console.log(this.state.toDoItems);
-		console.log(this.state.toDoId);
+	};
+
+	deleteToDo = async (id) => {
+		if (this.state.todos[0]._id || id) {
+			await delToDo(`http://localhost:8080/todos/${id}/delete`, this.state.token);
+
+			const toDoLists = [...this.state.todos];
+			const newToDos = toDoLists.filter((todo) => todo._id !== id);
+
+			const toDoItems = [...this.state.toDoItems];
+			const newItems = toDoItems.filter((Item) => Item.toDoId !== id);
+
+			if (this.state.todos[0]._id) {
+				this.getToDo(this.state.todos[0]._id);
+			}
+			this.setState({ todos: newToDos, toDoItems: newItems });
+		}
 	};
 
 	//Body posts title & done, then recieves data from end point and updates state.
@@ -101,14 +122,11 @@ class App extends Component {
 	};
 
 	update = async (title) => {
-		console.log(title);
 		await patchItem(
 			`http://localhost:8080/items/update/${this.state.selectedItem}`,
 			title,
 			this.state.token
 		);
-		console.log(this.state.toDoItems);
-		console.log(this.state.selectedItem);
 		const index = this.state.toDoItems.findIndex((Item) => Item._id === this.state.selectedItem);
 		const oldState = [...this.state.toDoItems];
 		oldState[index].title = title;
@@ -122,8 +140,6 @@ class App extends Component {
 	orderByCreated = async () => {
 		console.log(this.state.toggleCreateOrder);
 		if (this.state.toggleCreateOrder) {
-			// {comment: this.comment, id: this.postId}
-			console.log(this.state.toDoId);
 			const res = await getOrderBy(
 				`http://localhost:8080/items/sort/created/${-1}&${this.state.toDoId}`,
 				this.state.token
@@ -284,11 +300,11 @@ class App extends Component {
 							<PrivateRoute
 								exact
 								path={'/items'}
-								component={ItemContainer}
+								component={ToDoContainer}
 								isAuthenticated={this.state.token}
 								users={this.state.users}
-								items={this.state.items}
 								todos={this.state.todos}
+								deleteToDo={this.deleteToDo}
 								toDoItems={this.state.toDoItems}
 								getToDoWithId={this.getToDo}
 								createToDo={this.createToDo}
