@@ -46,17 +46,15 @@ class App extends Component {
 	//Application has rendered on the client side
 	async componentDidMount() {
 		console.log('component did mount');
-		try {
-			if (this.state.token) {
+		if (this.state.token) {
+			try {
 				const user = await getUser('http://localhost:8080/users', this.state.token);
 				this.setState({ users: user.data });
 				window.localStorage.setItem('role', user.data.role);
+			} catch (err) {
+				console.log(err);
 			}
-		} catch (err) {
-			console.log(err);
-		}
-		try {
-			if (this.state.token) {
+			try {
 				const toDo = await getToDo('http://localhost:8080/todos/', this.state.token);
 				const toDoItems = await getItems('http://localhost:8080/items/', this.state.token);
 				this.setState({
@@ -66,9 +64,9 @@ class App extends Component {
 				});
 				console.log(this.state.todos);
 				console.log(this.state.toDoItems);
+			} catch (error) {
+				console.log('ERR');
 			}
-		} catch (error) {
-			console.log('ERR');
 		}
 	}
 
