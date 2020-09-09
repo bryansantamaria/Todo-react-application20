@@ -42,7 +42,55 @@ class ToDoNavbar extends Component {
 		}
 	};
 
-	render() {}
+	render() {
+		return (
+			<div id='ItemHeader'>
+				<i className='fas fa-user userIcons' id='user'>
+					{' '}
+				</i>
+				<span id='userOnline'>
+					{' '}
+					Hi {this.props.users.name} ({this.props.users.role})
+				</span>
+				<CreateToDo createToDo={this.props.createToDo} />
+				<div id='selectContainer'>
+					<label htmlFor='select' id='selectLabel'>
+						Select Todo-list
+						<NativeSelect
+							id='select'
+							value={this.state.title}
+							onChange={this.handleSelectedToDo}
+							selected='selected'
+						>
+							{' '}
+							{this.props.todos.map((todo) => (
+								<option key={todo._id} value={todo.title} id={todo._id}>
+									{todo.title}
+								</option>
+							))}
+						</NativeSelect>
+					</label>
+				</div>
+				<Button
+					id='btn-deleteToDo'
+					type='button'
+					onClick={() => this.deleteToDo(this.state.toDoId)}
+					variant='contained'
+					color='secondary'
+					size='small'
+				>
+					<i className='fas fa-trash-alt'></i>
+				</Button>
+				<div id='userGrid'>
+					{this.addUserIfAdmin()}
+					<a id='logoutBtn' href='/auth'>
+						<i className='fas fa-sign-out-alt'></i>
+					</a>
+					<span id='logout'>Logout</span>
+				</div>
+			</div>
+		);
+	}
 }
 
 export default ToDoNavbar;
