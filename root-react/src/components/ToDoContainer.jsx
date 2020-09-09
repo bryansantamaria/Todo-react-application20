@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
+import ToDoNavbar from './ToDoNavbar';
 import ToDoItem from './ToDoItem';
 import CreateItem from './CreateItem';
-import CreateToDo from './CreateTodo';
+
 import {
 	Table,
 	TableBody,
@@ -10,11 +11,10 @@ import {
 	TableHead,
 	TableRow,
 	Paper,
-	NativeSelect,
 } from '@material-ui/core';
 
-class ItemContainer extends Component {
-	state = { value: '', toDoId: '' };
+class ToDoContainer extends Component {
+	state = {};
 
 	toggleCreatedArrow = () => {
 		return this.props.toggleCreateOrder ? (
@@ -31,69 +31,16 @@ class ItemContainer extends Component {
 		);
 	};
 
-	addUserIfAdmin = () => {
-		return this.props.users.role === 'admin' ? (
-			<span>
-				<a className='addUserIcon' href='/create'>
-					<i className='fas fa-user-plus userIcons' href='/create'></i>
-				</a>{' '}
-				<span id='add'>Add</span>
-			</span>
-		) : (
-			<span></span>
-		);
-	};
-	handleSelectedToDo = (e) => {
-		let select = document.getElementById('select');
-		var options = select.options;
-		var id = options[options.selectedIndex].id;
-		this.props.getToDoWithId(id);
-		this.setState({
-			value: e.target.value,
-			toDoId: id,
-		});
-		return id;
-	};
-
 	render() {
 		return (
 			<div className='ItemContainer'>
-				<div id='ItemHeader'>
-					<i className='fas fa-user userIcons' id='user'>
-						{' '}
-					</i>
-					<span id='userOnline'>
-						{' '}
-						Hi {this.props.users.name} ({this.props.users.role})
-					</span>
-					<CreateToDo createToDo={this.props.createToDo} />
-					<div id='selectContainer'>
-						<label htmlFor='select' id='selectLabel'>
-							Select Todo-list
-							<NativeSelect
-								id='select'
-								value={this.state.title}
-								onChange={this.handleSelectedToDo}
-								selected='selected'
-							>
-								{' '}
-								{this.props.todos.map((todo) => (
-									<option key={todo._id} value={todo.title} id={todo._id}>
-										{todo.title}
-									</option>
-								))}
-							</NativeSelect>
-						</label>
-					</div>
-					<div id='userGrid'>
-						{this.addUserIfAdmin()}
-						<a id='logoutBtn' href='/auth'>
-							<i className='fas fa-sign-out-alt'></i>
-						</a>
-						<span id='logout'>Logout</span>
-					</div>
-				</div>
-
+				<ToDoNavbar
+					users={this.props.users}
+					getToDoWithId={this.props.getToDoWithId}
+					createToDo={this.props.createToDo}
+					deleteToDo={this.props.deleteToDo}
+					todos={this.props.todos}
+				/>
 				<Paper id='container'>
 					<TableContainer component={Paper} style={{ maxHeight: '70vh' }}>
 						<Table stickyHeader aria-label='sticky table'>
@@ -151,4 +98,4 @@ class ItemContainer extends Component {
 	}
 }
 
-export default ItemContainer;
+export default ToDoContainer;
