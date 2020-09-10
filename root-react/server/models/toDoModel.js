@@ -9,12 +9,12 @@ const insertToDo = async (title, userId) => {
 };
 
 const getAsAdmin = async () => {
-	const doc = await toDoCollection.find({}).limit(5).sort({ created: -1 });
+	const doc = await toDoCollection.find({}).limit(5).sort({ created: 1 });
 	return doc;
 };
 
 const getAsUser = async (id) => {
-	const doc = await toDoCollection.find({ userId: id }).limit(5).sort({ created: -1 });
+	const doc = await toDoCollection.find({ userId: id }).limit(5).sort({ created: 1 });
 	return doc;
 };
 
