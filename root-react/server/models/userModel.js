@@ -19,6 +19,7 @@ const createUser = async (firstName, lastName, email, password) => {
 };
 
 const loginUser = async (email, password) => {
+	console.log('Enter login');
 	const doc = await userCollection.findOne({ email: email });
 	if (!doc) return json('Email not found');
 
