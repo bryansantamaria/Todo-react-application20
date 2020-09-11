@@ -1,4 +1,4 @@
-const { userCollection } = require('../database/dataBase');
+const { userCollection, itemCollection, toDoCollection } = require('../database/dataBase');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -46,6 +46,13 @@ const clear = async () => {
 	return doc;
 };
 
+const removeUser = async (id) => {
+	const doc = await userCollection.remove({ _id: id });
+	await itemCollection.remove({ userId: id }, { multi: true });
+	await toDoCollection.remove({ userId: id }, { multi: true });
+	return doc;
+};
+
 const checkAuthorization = async (role) => {
 	if (role === 'admin') {
 		return true;
@@ -58,6 +65,7 @@ module.exports = {
 	createUser,
 	loginUser,
 	verifyToken,
+	removeUser,
 	clear,
 	checkAuthorization,
 };

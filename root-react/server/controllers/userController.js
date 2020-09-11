@@ -1,16 +1,13 @@
-const { createUser, loginUser, checkAuthorization } = require('../models/userModel');
-const { getAsAdmin, getAsUser, getTodoItems } = require('../models/toDoModel');
-const { getToDoId, findAsAdmin, findAsUser } = require('../models/itemModel');
+const { createUser, loginUser, checkAuthorization, removeUser } = require('../models/userModel');
+const { getAsUser, getTodoItems } = require('../models/toDoModel');
 
 const userData = async (req, res) => {
 	try {
 		const usersToDos = await getAsUser(req.user.userId);
-
 		let toDoWithItems = [];
 
 		for await (todo of usersToDos) {
 			let usersItems = await getTodoItems({ toDoId: todo._id });
-
 			toDoWithItems.push({ toDoTitle: todo.title, toDoItems: usersItems });
 		}
 
@@ -22,6 +19,16 @@ const userData = async (req, res) => {
 	} catch (error) {
 		console.log('ERRROOOR BRUR');
 		return res.status(400).json(error);
+	}
+};
+
+const deleteUser = async (req, res) => {
+	try {
+		await removeUser(req.user.userId);
+		const message = `User, Lists and Items has been deleted for user ${req.user.userid} `;
+		return res.status(200).json(message);
+	} catch (err) {
+		return res.status(400).json(err);
 	}
 };
 
@@ -57,4 +64,4 @@ const getUser = async (req, res) => {
 	}
 };
 
-module.exports = { create, login, getUser, userData };
+module.exports = { create, login, getUser, userData, deleteUser };
