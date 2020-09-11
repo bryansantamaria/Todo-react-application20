@@ -54,7 +54,6 @@ const isOwner = async (postId, userId) => {
 };
 
 const checkAuthorization = async (role) => {
-	console.log('role: ' + role);
 	if (role === 'admin') {
 		return true;
 	} else {

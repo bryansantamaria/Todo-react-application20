@@ -47,7 +47,6 @@ const clear = async () => {
 };
 
 const checkAuthorization = async (role) => {
-	console.log('role: ' + role);
 	if (role === 'admin') {
 		return true;
 	} else {
