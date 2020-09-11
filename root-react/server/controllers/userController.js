@@ -1,4 +1,29 @@
 const { createUser, loginUser, checkAuthorization } = require('../models/userModel');
+const { getAsAdmin, getAsUser, getTodoItems } = require('../models/toDoModel');
+const { getToDoId, findAsAdmin, findAsUser } = require('../models/itemModel');
+
+const userData = async (req, res) => {
+	try {
+		const usersToDos = await getAsUser(req.user.userId);
+
+		let toDoWithItems = [];
+
+		for await (todo of usersToDos) {
+			let usersItems = await getTodoItems({ toDoId: todo._id });
+
+			toDoWithItems.push({ toDoTitle: todo.title, toDoItems: usersItems });
+		}
+
+		let userData = {
+			user: req.user,
+			toDoList: toDoWithItems,
+		};
+		return res.status(200).json(userData);
+	} catch (error) {
+		console.log('ERRROOOR BRUR');
+		return res.status(400).json(error);
+	}
+};
 
 const create = async (req, res) => {
 	const { firstName, lastName, email, password } = req.body;
@@ -18,6 +43,7 @@ const login = async (req, res) => {
 	const { email, password } = req.body;
 	try {
 		const token = await loginUser(email, password);
+		console.log(token);
 		return res.status(200).json(token);
 	} catch (error) {
 		return res.status(401).json(error);
@@ -26,7 +52,6 @@ const login = async (req, res) => {
 
 const getUser = async (req, res) => {
 	try {
-		console.log(req.user);
 		const { name, role } = req.user;
 		return res.status(200).json({ name, role });
 	} catch (error) {
@@ -34,4 +59,4 @@ const getUser = async (req, res) => {
 	}
 };
 
-module.exports = { create, login, getUser };
+module.exports = { create, login, getUser, userData };

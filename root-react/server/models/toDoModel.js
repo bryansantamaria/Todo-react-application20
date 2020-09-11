@@ -67,6 +67,16 @@ const clear = async () => {
 	return doc;
 };
 
+const getAllItems = async (filter) => {
+	const item = await itemCollection.find(filter).limit();
+	return item;
+};
+
+const getAllTodos = async (userId) => {
+	const todo = await toDoCollection.find({ userId: userId });
+	return todo;
+};
+
 module.exports = {
 	insertToDo,
 	getAsAdmin,
@@ -77,4 +87,6 @@ module.exports = {
 	isOwner,
 	checkAuthorization,
 	clear,
+	getAllItems,
+	getAllTodos,
 };
