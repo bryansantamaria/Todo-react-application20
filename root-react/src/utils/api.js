@@ -39,7 +39,6 @@ export const postToDo = async (url, title, token) => {
 			}
 		)
 		.then((res) => {
-			console.log(res);
 			return res;
 		});
 	return data;
@@ -87,7 +86,6 @@ export const postItem = async (url, title, toDoId, token) => {
 			}
 		)
 		.then((res) => {
-			console.log(res);
 			return res;
 		});
 	return data;
@@ -191,7 +189,6 @@ export const postAccount = async (firstName, lastName, email, password, token) =
 			}
 		)
 		.then((res) => {
-			console.log(res);
 			return res;
 		});
 	return data;

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import CreateToDo from './CreateTodo';
+import CreateToDo from './CreateToDo';
 import { NativeSelect, Button } from '@material-ui/core';
 
 class ToDoNavbar extends Component {
-	state = { value: '', toDoId: '' };
+	state = { value: '', toDoId: '', title: '' };
 	addUserIfAdmin = () => {
 		return this.props.users.role === 'admin' ? (
 			<span>
@@ -20,7 +20,7 @@ class ToDoNavbar extends Component {
 		let select = document.getElementById('select');
 		var options = select.options;
 		var id = options[options.selectedIndex].id;
-		this.props.getToDoWithId(id);
+		this.props.getToDoWithId(id, e.target.value);
 		this.setState({
 			value: e.target.value,
 			toDoId: id,
@@ -29,14 +29,22 @@ class ToDoNavbar extends Component {
 	};
 
 	deleteToDo = (id) => {
+		const [lastTodo] = this.props.todos.slice(-1);
+		const index = this.props.todos.findIndex((todo) => todo._id === lastTodo._id);
+		console.log(index);
 		try {
-			console.log('WHYYY BRUH');
-			console.log(this.props.todos);
-
-			if (this.props.todos !== undefined) {
-				console.log('WHY WOULD U ENTER?');
-				id ? this.props.deleteToDo(id) : this.props.deleteToDo(this.props.todos[0]._id);
+			if (this.props.todos.length >= 0 && this.props.createBtnState) {
+				id
+					? this.props.deleteToDo(id, lastTodo.title)
+					: this.props.deleteToDo(this.props.todos[index]._id);
+			} else {
+				id
+					? this.props.deleteToDo(id, lastTodo.title)
+					: this.props.deleteToDo(this.props.todos[0]._id);
 			}
+			this.setState({
+				toDoId: null,
+			});
 		} catch (error) {
 			console.log('ERR');
 		}
@@ -58,16 +66,18 @@ class ToDoNavbar extends Component {
 						Select Todo-list
 						<NativeSelect
 							id='select'
-							value={this.state.title}
+							value={this.props.toDoTitle}
 							onChange={this.handleSelectedToDo}
 							selected='selected'
 						>
 							{' '}
-							{this.props.todos.map((todo) => (
-								<option key={todo._id} value={todo.title} id={todo._id}>
-									{todo.title}
-								</option>
-							))}
+							{this.props.todos < 0
+								? null
+								: this.props.todos.map((todo) => (
+										<option key={todo._id} value={todo.title} id={todo._id}>
+											{todo.title}
+										</option>
+								  ))}
 						</NativeSelect>
 					</label>
 				</div>

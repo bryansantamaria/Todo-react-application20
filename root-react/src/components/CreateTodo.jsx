@@ -5,9 +5,8 @@ class CreateToDo extends Component {
 	state = { title: '', open: false };
 
 	submit = (title) => {
-		console.log(title);
 		this.props.createToDo(title);
-		this.setState({ open: false });
+		this.setState({ open: false, title: '' });
 	};
 	handleOpen = () => {
 		this.setState({ open: true });
