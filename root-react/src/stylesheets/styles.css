@@ -362,3 +362,33 @@ h1 {
 	font-size: 0.82em;
 	line-height: 1.4;
 }
+
+#cookieModalBottom {
+	display: grid;
+	float: inline-end;
+	grid-template-rows: 20vh;
+	grid-template-columns: 15vw 15vw;
+	grid-gap: 15px;
+}
+
+#userDataBtn {
+	align-self: end;
+	color: #487b94;
+	background-color: #ffffff;
+	font-weight: bold;
+	margin-top: 3px;
+	margin-left: 5px;
+	cursor: pointer;
+	border: none;
+}
+
+#removeUserBtn {
+	color: #ff0000;
+	background-color: #ffffff;
+	font-weight: bold;
+	margin-top: 3px;
+	margin-left: 5px;
+	cursor: pointer;
+	border: none;
+	align-self: end;
+}

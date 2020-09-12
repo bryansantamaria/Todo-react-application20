@@ -57,6 +57,7 @@ class App extends Component {
 				const toDo = await getToDo('http://localhost:8080/todos/', this.state.token);
 				const toDoItems = await getItems('http://localhost:8080/items/', this.state.token);
 				if (toDo || toDoItems) {
+					console.log('enter');
 					this.setState({
 						todos: toDo.data,
 						toDoItems: toDoItems.data,

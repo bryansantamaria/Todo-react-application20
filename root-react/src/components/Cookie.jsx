@@ -27,18 +27,25 @@ class Cookie extends Component {
 	};
 
 	declineCookie = async () => {
-		localStorage.removeItem('token');
-		localStorage.removeItem('name');
-		localStorage.removeItem('role');
-		await axios
-			.get(`http://localhost:8080/users/delete`, {
-				headers: {
-					Authorization: 'Bearer ' + this.props.token,
-				},
-			})
-			.then((res) => {
-				this.setState({ open: false, userRemoved: true });
-			});
+		const doubleCheck = window.confirm(
+			`You are about to be forgotten. All your data will be erased, are you sure about this?`
+		);
+		if (doubleCheck === true) {
+			localStorage.removeItem('token');
+			localStorage.removeItem('name');
+			localStorage.removeItem('role');
+			await axios
+				.get(`http://localhost:8080/users/delete`, {
+					headers: {
+						Authorization: 'Bearer ' + this.props.token,
+					},
+				})
+				.then((res) => {
+					this.setState({ open: false, userRemoved: true });
+				});
+		} else {
+			this.setState({ open: false });
+		}
 	};
 
 	handleClose = () => {
@@ -78,16 +85,19 @@ class Cookie extends Component {
 							personalized experience. Because we respect your right to privacy, you can choose not
 							to allow cookies. You may also choose to get the all the information we have stored
 							about you. If this is your choice, click on "HELL NO, give me my data!"
-						</p>
+						</p>{' '}
+						<br />
 						<button className='acceptCookies' type='button' onClick={this.submitCookie}>
 							Accept
 						</button>
-						<button id='getData' type='button' onClick={this.getUserData}>
-							I want my data!
-						</button>
-						<button id='declineCookies' type='button' onClick={this.declineCookie}>
-							I WANT TO BE FORGOTTEN!
-						</button>
+						<div id='cookieModalBottom'>
+							<button id='userDataBtn' type='button' onClick={this.getUserData}>
+								Give me my data
+							</button>
+							<button id='removeUserBtn' type='button' onClick={this.declineCookie}>
+								Remove my data
+							</button>
+						</div>
 					</div>
 				</Modal>
 			</div>
