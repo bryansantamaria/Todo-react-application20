@@ -17,6 +17,7 @@ class Cookie extends Component {
 	}
 
 	submitCookie = () => {
+		document.getElementById('cookieContainer').style.display = 'none';
 		this.props.setCookie(this.state.userData.user);
 		this.setState({ open: false });
 	};
@@ -68,7 +69,7 @@ class Cookie extends Component {
 				>
 					<div className='cookieModal'>
 						<h1 id='cookieTitle'>Your Privacy</h1>
-						<p>
+						<p id='modalText'>
 							{' '}
 							When you visit any website, it may store or retrieve information on your browser,
 							mostly in the form of cookies. This information might be about you, your preferences
