@@ -24,7 +24,7 @@ class CreateToDo extends Component {
 		return (
 			<span id='AddToDo'>
 				<button id='AddToDoBtn' type='button' onClick={this.handleOpen}>
-					Add Todo list
+					Add List
 				</button>
 
 				<Modal

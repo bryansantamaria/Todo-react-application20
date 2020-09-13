@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import CreateToDo from './CreateToDo';
-import { NativeSelect, Button } from '@material-ui/core';
+import { NativeSelect } from '@material-ui/core';
 
 class ToDoNavbar extends Component {
 	state = { value: '', toDoId: '', title: '' };
@@ -57,6 +57,7 @@ class ToDoNavbar extends Component {
 	};
 
 	render() {
+		console.log(this.props.todos.length);
 		return (
 			<div id='ItemHeader'>
 				<i className='fas fa-user userIcons' id='user'>
@@ -68,35 +69,32 @@ class ToDoNavbar extends Component {
 				</span>
 				<CreateToDo createToDo={this.props.createToDo} />
 				<div id='selectContainer'>
-					<label htmlFor='select' id='selectLabel'>
-						Select Todo-list
-						<NativeSelect
-							id='select'
-							value={this.props.toDoTitle}
-							onChange={this.handleSelectedToDo}
-							selected='selected'
-						>
-							{' '}
-							{this.props.todos < 0
-								? null
-								: this.props.todos.map((todo) => (
-										<option key={todo._id} value={todo.title} id={todo._id}>
-											{todo.title}
-										</option>
-								  ))}
-						</NativeSelect>
-					</label>
+					<NativeSelect
+						id='select'
+						value={this.props.toDoTitle}
+						onChange={this.handleSelectedToDo}
+						selected='selected'
+					>
+						{this.props.todos < 0
+							? null
+							: this.props.todos.map((todo) => (
+									<option className='listOption' key={todo._id} value={todo.title} id={todo._id}>
+										{todo.title}
+									</option>
+							  ))}
+					</NativeSelect>
+
+					<i
+						className='fas fa-trash-alt'
+						id='btn-deleteToDo'
+						type='button'
+						onClick={() => this.deleteToDo(this.state.toDoId)}
+						variant='contained'
+						color='secondary'
+						size='small'
+					></i>
 				</div>
-				<Button
-					id='btn-deleteToDo'
-					type='button'
-					onClick={() => this.deleteToDo(this.state.toDoId)}
-					variant='contained'
-					color='secondary'
-					size='small'
-				>
-					<i className='fas fa-trash-alt'></i>
-				</Button>
+
 				<div id='userGrid'>
 					{this.addUserIfAdmin()}
 					<a id='logoutBtn' href='/auth' onClick={this.logout}>

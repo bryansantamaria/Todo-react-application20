@@ -130,10 +130,9 @@ body {
 
 #selectContainer {
 	float: left;
-	margin-left: 25px;
 	display: grid;
-	grid-template-rows: 40px 10px;
-	grid-template-columns: 13vw;
+	grid-template-rows: 40px;
+	grid-template-columns: 13vw 15px;
 }
 
 #selectLabel {
@@ -143,7 +142,14 @@ body {
 }
 
 #select {
+	font-family: 'Courier New', Courier, monospace;
+	color: rgb(50, 50, 56);
 	width: 10vw;
+	font-size: 0.9em;
+}
+
+.listOption {
+	color: rgb(50, 50, 56);
 }
 
 #AddToDo {
@@ -151,11 +157,11 @@ body {
 }
 #AddToDoBtn {
 	width: 14vw;
-	padding: 10px;
-	border-radius: 5px;
 	margin-top: 10px;
-	background-color: #6782b7;
-	color: white;
+	background-color: transparent;
+	color: rgb(50, 50, 56);
+	border: none;
+	cursor: pointer;
 }
 
 .modalBox {
@@ -222,8 +228,10 @@ body {
 }
 
 #btn-deleteToDo {
-	margin-top: 15px;
-	padding: 10px;
+	margin-top: 10px;
+	background: transparent;
+	color: black;
+	cursor: pointer;
 }
 
 .orderBy:hover {
@@ -391,4 +399,9 @@ h1 {
 	cursor: pointer;
 	border: none;
 	align-self: end;
+}
+
+.navbar-brand {
+	padding: 18px 20px;
+	display: inline-block;
 }
