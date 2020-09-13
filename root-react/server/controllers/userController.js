@@ -1,5 +1,5 @@
 const { createUser, loginUser, checkAuthorization, removeUser } = require('../models/userModel');
-const { getAsUser, getTodoItems } = require('../models/toDoModel');
+const { getAsUser, getTodoItems, insertToDo } = require('../models/toDoModel');
 
 const userData = async (req, res) => {
 	try {
@@ -38,6 +38,7 @@ const create = async (req, res) => {
 		if (await checkAuthorization(req.user.role)) {
 			console.log('Authorized!!');
 			const doc = await createUser(firstName, lastName, email, password);
+			await insertToDo('My Tasks', doc._id);
 			return res.status(200).json(doc);
 		}
 	} catch (error) {
