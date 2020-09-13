@@ -50,6 +50,12 @@ class ToDoNavbar extends Component {
 		}
 	};
 
+	logout = () => {
+		sessionStorage.removeItem('token');
+		sessionStorage.removeItem('name');
+		sessionStorage.removeItem('role');
+	};
+
 	render() {
 		return (
 			<div id='ItemHeader'>
@@ -93,7 +99,7 @@ class ToDoNavbar extends Component {
 				</Button>
 				<div id='userGrid'>
 					{this.addUserIfAdmin()}
-					<a id='logoutBtn' href='/auth'>
+					<a id='logoutBtn' href='/auth' onClick={this.logout}>
 						<i className='fas fa-sign-out-alt'></i>
 					</a>
 					<span id='logout'>Logout</span>

@@ -39,7 +39,7 @@ class App extends Component {
 			toggleCreateOrder: false,
 			toggleUpdatedOrder: false,
 			isAuthenticated: false,
-			token: localStorage.getItem('token'),
+			token: sessionStorage.getItem('token'),
 			users: {},
 		};
 		this.limit = 0;
@@ -50,14 +50,13 @@ class App extends Component {
 		console.log('component did mount');
 		if (this.state.token) {
 			try {
-				const name = localStorage.getItem('name');
-				const role = localStorage.getItem('role');
+				const name = sessionStorage.getItem('name');
+				const role = sessionStorage.getItem('role');
 				const user = { name: name, role: role };
 				this.setState({ users: user });
 				const toDo = await getToDo('http://localhost:8080/todos/', this.state.token);
-				const toDoItems = await getItems('http://localhost:8080/items/', this.state.token);
-				if (toDo || toDoItems) {
-					console.log('enter');
+				if (toDo.data.length > 0) {
+					const toDoItems = await getItems('http://localhost:8080/items/', this.state.token);
 					this.setState({
 						todos: toDo.data,
 						toDoItems: toDoItems.data,
@@ -72,7 +71,7 @@ class App extends Component {
 
 	isAuthenticated = (auth) => {
 		console.log(auth);
-		const isAuthenticated = localStorage.getItem('token');
+		const isAuthenticated = sessionStorage.getItem('token');
 
 		if (auth) {
 			console.log('Authorized');
@@ -82,9 +81,9 @@ class App extends Component {
 	};
 
 	setCookie = async (userData) => {
-		window.localStorage.setItem('token', this.state.token);
-		window.localStorage.setItem('role', userData.role);
-		window.localStorage.setItem('name', userData.name);
+		window.sessionStorage.setItem('token', this.state.token);
+		window.sessionStorage.setItem('role', userData.role);
+		window.sessionStorage.setItem('name', userData.name);
 		this.setState({ users: userData });
 	};
 

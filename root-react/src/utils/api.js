@@ -134,7 +134,6 @@ export const patchItem = async (url, title, token) => {
 		.then((res) => {
 			return res;
 		});
-	console.log(data);
 	return data;
 };
 
@@ -155,7 +154,6 @@ export const updateCompleted = async (url, title, done, token) => {
 		.then((res) => {
 			return res;
 		});
-	console.log(data);
 	return data;
 };
 

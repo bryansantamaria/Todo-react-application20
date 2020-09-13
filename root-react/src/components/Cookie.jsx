@@ -14,6 +14,10 @@ class Cookie extends Component {
 			.then((res) => {
 				this.setState({ userData: res.data });
 			});
+
+		if (sessionStorage.getItem('name')) {
+			document.getElementById('cookieContainer').style.display = 'none';
+		}
 	}
 
 	submitCookie = () => {
@@ -26,14 +30,14 @@ class Cookie extends Component {
 		console.log(this.state.userData);
 	};
 
-	declineCookie = async () => {
+	userForgotten = async () => {
 		const doubleCheck = window.confirm(
 			`You are about to be forgotten. All your data will be erased, are you sure about this?`
 		);
 		if (doubleCheck === true) {
-			localStorage.removeItem('token');
-			localStorage.removeItem('name');
-			localStorage.removeItem('role');
+			sessionStorage.removeItem('token');
+			sessionStorage.removeItem('name');
+			sessionStorage.removeItem('role');
 			await axios
 				.get(`http://localhost:8080/users/delete`, {
 					headers: {
@@ -94,7 +98,7 @@ class Cookie extends Component {
 							<button id='userDataBtn' type='button' onClick={this.getUserData}>
 								Give me my data
 							</button>
-							<button id='removeUserBtn' type='button' onClick={this.declineCookie}>
+							<button id='removeUserBtn' type='button' onClick={this.userForgotten}>
 								Remove my data
 							</button>
 						</div>
