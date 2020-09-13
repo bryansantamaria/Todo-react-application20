@@ -57,7 +57,6 @@ class ToDoNavbar extends Component {
 	};
 
 	render() {
-		console.log(this.props.todos.length);
 		return (
 			<div id='ItemHeader'>
 				<i className='fas fa-user userIcons' id='user'>
