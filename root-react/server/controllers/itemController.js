@@ -36,7 +36,7 @@ const getItems = async (req, res) => {
 			return res.status(200).json(doc);
 		}
 	} catch (error) {
-		return res.status(403).json(error);
+		return res.status(401).json(error);
 	}
 };
 
