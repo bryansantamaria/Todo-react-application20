@@ -69,6 +69,15 @@ body {
 	margin-left: 13vh;
 }
 
+#createAccLink {
+	margin-top: 15px;
+}
+.createAnchor {
+	color: rgb(107, 107, 241);
+	text-decoration: none;
+	margin-left: 5vh;
+}
+
 .userIcons {
 	font-size: 1.4rem;
 	padding: 7px;

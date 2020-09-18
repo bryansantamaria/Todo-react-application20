@@ -71,6 +71,12 @@ class Login extends Component {
 									Submit
 								</Button>{' '}
 							</div>
+							<div id='createAccLink'>
+								<span>Dont have an account?</span> <br />
+								<a className='createAnchor' href='/create'>
+									<span>Create Account</span>
+								</a>{' '}
+							</div>
 						</div>
 					</Card>
 				</form>

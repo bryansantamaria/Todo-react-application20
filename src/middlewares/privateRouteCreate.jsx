@@ -1,17 +1,18 @@
 import React from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 
 function PrivateRouteCreate({ component: Component, ...rest }) {
-	const isAdmin = sessionStorage.getItem('role');
+	// const isAdmin = sessionStorage.getItem('role');
 	return (
 		<Route
 			{...rest}
-			render={(props) =>
-				isAdmin === 'admin' ? (
-					<Component exact path='/create' {...props} {...rest} />
-				) : (
-					<Redirect to='/' />
-				)
+			render={
+				(props) => <Component exact path='/create' {...props} {...rest} />
+				// isAdmin === 'admin' ? (
+				// 	<Component exact path='/create' {...props} {...rest} />
+				// ) : (
+				// 	<Redirect to='/' />
+				// )
 			}
 		/>
 	);

@@ -10,13 +10,14 @@ class CreateAccount extends Component {
 		const res = await postAccount(firstName, lastName, email, password, this.props.token);
 
 		this.setState({ users: res.data });
-		console.log(this.state.users);
+		sessionStorage.removeItem('token');
+		sessionStorage.removeItem('name');
+		sessionStorage.removeItem('role');
+		window.location.href = '/';
 	};
 
 	onSubmit = (e) => {
 		e.preventDefault();
-
-		console.log(this.state);
 		this.setState({ firstName: '', lastName: '', email: '', password: '' });
 	};
 
