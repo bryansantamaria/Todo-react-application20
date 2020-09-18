@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import CreateToDo from './CreateToDos';
+import CreateToDo from './CreateTodos';
 import { NativeSelect } from '@material-ui/core';
 
 class ToDoNavbar extends Component {
