@@ -5,15 +5,19 @@ class Cookie extends Component {
 	state = { open: false, userData: [], userRemoved: false };
 
 	async componentDidMount() {
-		await axios
-			.get(`http://localhost:8080/users/getData`, {
-				headers: {
-					Authorization: 'Bearer ' + this.props.token,
-				},
-			})
-			.then((res) => {
-				this.setState({ userData: res.data });
-			});
+		try {
+			await axios
+				.get(`/users/getData`, {
+					headers: {
+						Authorization: 'Bearer ' + this.props.token,
+					},
+				})
+				.then((res) => {
+					this.setState({ userData: res.data });
+				});
+		} catch (error) {
+			console.log('ERRR');
+		}
 
 		if (sessionStorage.getItem('name')) {
 			document.getElementById('cookieContainer').style.display = 'none';
@@ -39,7 +43,7 @@ class Cookie extends Component {
 			sessionStorage.removeItem('name');
 			sessionStorage.removeItem('role');
 			await axios
-				.get(`http://localhost:8080/users/delete`, {
+				.get(`/users/delete`, {
 					headers: {
 						Authorization: 'Bearer ' + this.props.token,
 					},
