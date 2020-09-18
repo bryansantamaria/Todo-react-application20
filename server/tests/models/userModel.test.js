@@ -1,9 +1,17 @@
+const Database = require('../../database/dataBase');
 const chai = require('chai');
 chai.should();
 
 const Users = require('../../models/userModel');
 
 describe('userModel', () => {
+	before(async () => {
+		await Database.connect();
+	});
+
+	after(async () => {
+		await Database.disconnect();
+	});
 	beforeEach(async function () {
 		await Users.clear();
 		const user = await Users.createUser('Bryan', 'Santamaria', 'bryan@gmail.com', 'lol', 'admin');
@@ -14,6 +22,7 @@ describe('userModel', () => {
 
 	it('Should create a user and check if user has exact keys and values', async function () {
 		await this.test.user.should.deep.equal({
+			__v: 0,
 			firstName: 'Bryan',
 			lastName: 'Santamaria',
 			email: 'bryan@gmail.com',
