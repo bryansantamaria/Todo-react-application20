@@ -1,5 +1,6 @@
 const { createUser, loginUser, checkAuthorization, removeUser } = require('../models/userModel');
-const { getAsUser, getTodoItems, insertToDo } = require('../models/toDoModel');
+const { getAsUser, insertToDo, removeUserToDo } = require('../models/toDoModel');
+const { todoWithItems, removeUserItems } = require('../models/itemModel');
 
 const userData = async (req, res) => {
 	try {
@@ -7,7 +8,7 @@ const userData = async (req, res) => {
 		let toDoWithItems = [];
 
 		for await (todo of usersToDos) {
-			let usersItems = await getTodoItems({ toDoId: todo._id });
+			let usersItems = await todoWithItems({ toDoId: todo._id });
 			toDoWithItems.push({ toDoTitle: todo.title, toDoItems: usersItems });
 		}
 
@@ -24,10 +25,15 @@ const userData = async (req, res) => {
 
 const deleteUser = async (req, res) => {
 	try {
+		console.log('enter deleteUser');
 		await removeUser(req.user.userId);
+		await removeUserItems(req.user.userId);
+		await removeUserToDo(req.user.userId);
 		const message = `User, Lists and Items has been deleted for user ${req.user.userid} `;
+		console.log('finished deleteUser');
 		return res.status(200).json(message);
 	} catch (err) {
+		console.log(err);
 		return res.status(400).json(err);
 	}
 };
@@ -37,21 +43,27 @@ const create = async (req, res) => {
 	try {
 		if (await checkAuthorization(req.user.role)) {
 			console.log('Authorized!!');
+
 			const doc = await createUser(firstName, lastName, email, password);
+			console.log(doc);
 			await insertToDo('My Tasks', doc._id);
 			return res.status(200).json(doc);
 		}
 	} catch (error) {
+		console.log(error);
 		return res.status(401).json(error);
 	}
 };
 
 const login = async (req, res) => {
+	console.log('Entering LOGIN');
 	const { email, password } = req.body;
 	try {
 		const token = await loginUser(email, password);
+		console.log(token);
 		return res.status(200).json(token);
 	} catch (error) {
+		console.log(error);
 		return res.status(401).json(error);
 	}
 };
