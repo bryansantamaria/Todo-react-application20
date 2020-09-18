@@ -1,7 +1,16 @@
-const { toDoCollection, itemCollection } = require('../database/dataBase');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const toDoSchema = new mongoose.Schema({
+	title: String,
+	userId: { type: Schema.Types.ObjectId, ref: 'User' },
+	lastUpdated: String,
+});
+
+const ToDo = mongoose.model('ToDo', toDoSchema);
 
 const insertToDo = async (title, userId) => {
-	const doc = await toDoCollection.insert({
+	const doc = await ToDo.create({
 		title,
 		userId,
 	});
@@ -9,31 +18,27 @@ const insertToDo = async (title, userId) => {
 };
 
 const getAsAdmin = async () => {
-	const doc = await toDoCollection.find({}).limit(5).sort({ created: 1 });
+	const doc = await ToDo.find({}).limit(5).sort({ created: 1 });
 	return doc;
 };
 
 const getAsUser = async (id) => {
-	const doc = await toDoCollection.find({ userId: id }).limit(5).sort({ created: 1 });
+	const doc = await ToDo.find({ userId: id }).limit(5).sort({ created: 1 });
+	return doc;
+};
+
+const getOneToDo = async (toDoId) => {
+	const doc = await ToDo.findOne({ _id: toDoId });
 	return doc;
 };
 
 const deleteToDo = async (toDoId) => {
-	console.log(toDoId);
-	const item = await itemCollection.remove({ toDoId: toDoId }, { multi: true });
-	console.log(item);
-	const doc = await toDoCollection.remove({ _id: toDoId }, { multi: true });
-	console.log(doc);
-	return doc || item ? true : false;
-};
-
-const getTodoItems = async (filter) => {
-	const item = await itemCollection.find(filter).limit(5);
-	return item;
+	const doc = await ToDo.deleteOne({ _id: toDoId });
+	return doc ? true : false;
 };
 
 const updateTodo = async (toDoId, title) => {
-	const doc = await toDoCollection.update(
+	const doc = await ToDo.findOneAndUpdate(
 		{ _id: toDoId },
 		{
 			$set: {
@@ -41,16 +46,16 @@ const updateTodo = async (toDoId, title) => {
 				lastUpdated: new Date().toLocaleString(),
 			},
 		},
-		{ returnUpdatedDocs: true }
+		{ new: true }
 	);
 	console.log(doc);
 	return doc;
 };
 
 const isOwner = async (postId, userId) => {
-	const todoItem = await toDoCollection.findOne({ _id: postId });
-	console.log('Is Owner: ' + todoItem.userId === userId);
-	return todoItem.userId === userId;
+	const todoItem = await ToDo.findOne({ _id: postId });
+	console.log(todoItem.userId == userId ? true : false);
+	return todoItem.userId == userId ? true : false;
 };
 
 const checkAuthorization = async (role) => {
@@ -62,30 +67,29 @@ const checkAuthorization = async (role) => {
 };
 
 const clear = async () => {
-	const doc = await toDoCollection.remove({}, { multi: true });
+	const doc = await ToDo.deleteMany({}, { multi: true });
 	return doc;
 };
 
-const getAllItems = async (filter) => {
-	const item = await itemCollection.find(filter).limit();
-	return item;
-};
-
 const getAllTodos = async (userId) => {
-	const todo = await toDoCollection.find({ userId: userId });
+	const todo = await ToDo.find({ userId: userId });
 	return todo;
 };
 
+const removeUserToDo = async (id) => {
+	const doc = await ToDo.deleteMany({ userId: id }, { multi: true });
+	return doc;
+};
 module.exports = {
 	insertToDo,
 	getAsAdmin,
 	getAsUser,
 	deleteToDo,
-	getTodoItems,
 	updateTodo,
 	isOwner,
 	checkAuthorization,
 	clear,
-	getAllItems,
 	getAllTodos,
+	getOneToDo,
+	removeUserToDo,
 };

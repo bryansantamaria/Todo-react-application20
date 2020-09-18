@@ -1,32 +1,46 @@
-const { userCollection, itemCollection, toDoCollection } = require('../database/dataBase');
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
-const createUser = async (firstName, lastName, email, password) => {
-	const doc = await userCollection.findOne({ email: email });
-	if (!doc) {
-		const hash = bcrypt.hashSync(password, 10);
-		const doc = await userCollection.insert({
-			firstName,
-			lastName,
-			password: hash,
-			email,
-			role: 'user',
-		});
-		return doc;
+const userSchema = new mongoose.Schema({
+	firstName: String,
+	lastName: String,
+	email: { type: String, unique: true },
+	password: String,
+	role: String,
+});
+
+const User = mongoose.model('User', userSchema);
+
+const createUser = async (firstName, lastName, email, password, role = 'user') => {
+	try {
+		const doc = await User.findOne({ email: email }).exec();
+		if (!doc) {
+			const hash = bcrypt.hashSync(password, 10);
+			const doc = await User.create({
+				firstName,
+				lastName,
+				password: hash,
+				email,
+				role: role,
+			});
+			return doc._doc;
+		}
+		return console.log('EMAIL already registered!');
+	} catch (err) {
+		console.log(err);
 	}
-	return console.log('EMAIL already registered!');
 };
 
 const loginUser = async (email, password) => {
-	console.log('Enter login');
-	const doc = await userCollection.findOne({ email: email });
-	if (!doc) return json('Email not found');
+	const doc = await User.findOne({ email: email });
+	if (!doc) return console.log('email not found');
 
-	const success = await bcrypt.compareSync(password, doc.password);
-	if (!success) return json('Wrong password');
+	const success = bcrypt.compareSync(password, doc.password);
+	if (!success) return console.log('password not correct');
 
-	const token = await jwt.sign(
+	const token = jwt.sign(
 		{ email: doc.email, userId: doc._id, role: doc.role, name: doc.firstName },
 		process.env.SECRET,
 		{
@@ -42,14 +56,14 @@ const verifyToken = async (token, secret) => {
 };
 
 const clear = async () => {
-	const doc = await userCollection.remove({}, { multi: true });
+	const doc = await User.deleteMany({}, { multi: true });
 	return doc;
 };
 
 const removeUser = async (id) => {
-	const doc = await userCollection.remove({ _id: id });
-	await itemCollection.remove({ userId: id }, { multi: true });
-	await toDoCollection.remove({ userId: id }, { multi: true });
+	console.log('entering removeUser');
+	const doc = await User.deleteOne({ _id: id });
+	console.log('remove user finished');
 	return doc;
 };
 
