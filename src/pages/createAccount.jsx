@@ -79,11 +79,11 @@ class CreateAccount extends Component {
 						<div>
 							<div className='margin-top'>
 								<span>Already have an account?</span> <br />
-								<a className='loginAnchor' href='/auth'>
+								<a className='loginAnchor' href='/'>
 									<span>Sign in</span>
 								</a>{' '}
 								<Button
-									className='btn-todoitem'
+									className='btn-Itemitem'
 									type='submit'
 									value='Create Account'
 									variant='contained'
