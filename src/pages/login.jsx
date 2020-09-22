@@ -9,7 +9,6 @@ class Login extends Component {
 		const { email, password } = this.state;
 		const res = await postLogin(email, password);
 
-		console.log(res);
 		if (res.data) {
 			window.sessionStorage.setItem('token', res.data);
 			console.log(res.data);

@@ -54,6 +54,10 @@ class App extends Component {
 				const role = sessionStorage.getItem('role');
 				const user = { name: name, role: role };
 				this.setState({ users: user });
+			} catch (err) {
+				console.log(err);
+			}
+			try {
 				const toDo = await getToDo('/todos/', this.state.token);
 				if (toDo.data.length > 0) {
 					const toDoItems = await getItems('/items/', this.state.token);
@@ -70,7 +74,6 @@ class App extends Component {
 	}
 
 	isAuthenticated = (auth) => {
-		console.log(auth);
 		const isAuthenticated = sessionStorage.getItem('token');
 
 		if (auth) {
@@ -81,10 +84,17 @@ class App extends Component {
 	};
 
 	setCookie = async (userData) => {
-		window.sessionStorage.setItem('token', this.state.token);
-		window.sessionStorage.setItem('role', userData.role);
-		window.sessionStorage.setItem('name', userData.name);
-		this.setState({ users: userData });
+		console.log(userData);
+		try {
+			if (userData !== undefined) {
+				window.sessionStorage.setItem('role', userData.role);
+				window.sessionStorage.setItem('name', userData.name);
+				this.setState({ users: userData });
+			}
+		} catch (err) {
+			console.log(err);
+			console.log('No data found');
+		}
 	};
 
 	createToDo = async (title) => {

@@ -1,6 +1,3 @@
-const UserModel = require('../../server/models/userModel');
-const Database = require('../../server/database/dataBase');
-
 describe('Create Account page test', function () {
 	it('Should find click on Create Account and go to new URL', function () {
 		//Arrange - Setup initial app state
@@ -28,8 +25,11 @@ describe('Create Account page test', function () {
 		cy.url('include', '/todos');
 	});
 
-	it('Should find and accept cookie', function () {
-		// cy.get(".acceptCookies").click();
-		// cy.get("#cookieContainer")
+	it.only('Should find and accept cookie', function () {
+		setTimeout(function () {
+			cy.get('.acceptCookies').click();
+		}, 1500);
+
+		//cy.get('#cookieContainer').should('have.attr', 'display', '');
 	});
 });
