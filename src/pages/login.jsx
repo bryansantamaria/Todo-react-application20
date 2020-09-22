@@ -33,6 +33,7 @@ class Login extends Component {
 						<label htmlFor='email'>
 							<h3 className='logInTitles'>Email adress</h3>
 							<TextField
+								id='loginEmail'
 								className='createInputs'
 								type='email'
 								name='email'
@@ -48,6 +49,7 @@ class Login extends Component {
 							<h3 className='logInTitles'>Password</h3>
 						</label>
 						<TextField
+							id='loginPassword'
 							className='createInputs'
 							type='password'
 							name='password'

@@ -31,6 +31,7 @@ class CreateAccount extends Component {
 
 						<TextField
 							className='createInputs'
+							id='firstName'
 							type='input'
 							autoFocus
 							name='firstName'
@@ -44,6 +45,7 @@ class CreateAccount extends Component {
 
 						<TextField
 							className='createInputs'
+							id='lastName'
 							type='input'
 							name='lastName'
 							variant='outlined'
@@ -56,6 +58,7 @@ class CreateAccount extends Component {
 
 						<TextField
 							className='createInputs'
+							id='email'
 							type='email'
 							name='email'
 							variant='outlined'
@@ -68,6 +71,7 @@ class CreateAccount extends Component {
 
 						<TextField
 							className='createInputs'
+							id='password'
 							type='password'
 							name='title'
 							variant='outlined'
