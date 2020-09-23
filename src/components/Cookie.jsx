@@ -26,8 +26,6 @@ class Cookie extends Component {
 
 	submitCookie = () => {
 		this.props.setCookie(this.state.userData.user);
-		window.sessionStorage.setItem('role', this.state.userData.user.role);
-		window.sessionStorage.setItem('name', this.state.userData.user.name);
 		document.getElementById('cookieContainer').style.display = 'none';
 		this.setState({ open: false });
 	};

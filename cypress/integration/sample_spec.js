@@ -9,6 +9,8 @@ describe('Create Account page test', function () {
 	});
 
 	it('Should create a fake user and check for input values', function () {
+		cy.visit('http://localhost:3000/create');
+
 		cy.get('#firstName').type('Fake').should('have.value', 'Fake');
 		cy.get('#lastName').type('Fakesson').should('have.value', 'Fakesson');
 		cy.get('#email').type('fake@email.com').should('have.value', 'fake@email.com');
@@ -19,6 +21,8 @@ describe('Create Account page test', function () {
 	});
 
 	it('Should sign in a fake user', function () {
+		cy.visit('http://localhost:3000');
+
 		cy.get('#loginEmail').type('fake@email.com').should('have.value', 'fake@email.com');
 		cy.get('#loginPassword').type('lol').should('have.value', 'lol');
 		cy.contains('Submit').click();
@@ -26,9 +30,12 @@ describe('Create Account page test', function () {
 	});
 
 	it.only('Should find and accept cookie', function () {
+		cy.visit('http://localhost:3000/todos');
+
 		setTimeout(function () {
 			cy.get('.acceptCookies').click();
 		}, 1500);
+		cy.setCookie('role', 'user');
 
 		//cy.get('#cookieContainer').should('have.attr', 'display', '');
 	});
