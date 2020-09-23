@@ -26,17 +26,17 @@ describe('Create Account page test', function () {
 		cy.get('#loginEmail').type('fake@email.com').should('have.value', 'fake@email.com');
 		cy.get('#loginPassword').type('lol').should('have.value', 'lol');
 		cy.contains('Submit').click();
-		cy.url('include', '/todos');
+		cy.url('include', '/todo');
 	});
 
-	it.only('Should find and accept cookie', function () {
-		cy.visit('http://localhost:3000/todos');
-
+	it('Should find and accept cookie', function () {
 		setTimeout(function () {
 			cy.get('.acceptCookies').click();
 		}, 1500);
-		cy.setCookie('role', 'user');
 
-		//cy.get('#cookieContainer').should('have.attr', 'display', '');
+		expect(sessionStorage.getItem('role')).to.eq('user');
+		expect(sessionStorage.getItem('name')).to.eq('Fake');
 	});
+
+	it('Should add an item to My Task todo list', function () {});
 });
